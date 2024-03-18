@@ -1,0 +1,56 @@
+.colorPatient {
+    background: #9289AA;
+    border-color: #9289AA;
+}
+
+.colorPatient:hover{
+    color: #FDFBF6;
+    background-color: #5D4A66;
+    border-color: #FDFBF6;
+}
+.colorFree {
+    background: #5CA054;
+    border-color: #5CA054;
+}
+.colorFree:hover {
+    background: #C6C8EE;
+    border-color: #C6C8EE;
+}
+
+#subcontainer {
+    display: flex;
+    flex-direction: row;
+    gap: 2%;
+}
+
+.form-control {
+    width: 100%;
+}
+
+.btn {
+    height: 1%;
+}
+#calendar {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.fbContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 3%;
+    align-items: flex-start;
+}
+.modal-body {
+    display: flex;
+    flex-direction: column;
+}
+.frontText {
+    text-decoration: underline;
+    font-weight: 300;
+}
+.backText {
+    font-weight: 600;
+}
+
