@@ -10,8 +10,8 @@ class  cntrlLogin {
     */
     public function getConnectionForm() {
         if(session_status() !== PHP_SESSION_ACTIVE){
-    session_start();
-}
+            session_start();
+        }
         if (isset($_SESSION['user'])) {
             $utils = new Utils();
             $utils->echoInfo("Vous êtes déjà connecté ! Redirection sur l'accueil");
@@ -112,6 +112,7 @@ class  cntrlLogin {
     }
 
     public function getAccountEdit() {
+        $ajax   = [];
         $alerts = [];
         $daoUser        = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
         $daoSpeciality  = new DaoSpeciality(DBHOST, DBNAME, PORT, USER, PASS);
@@ -119,14 +120,25 @@ class  cntrlLogin {
         if(session_status() !== PHP_SESSION_ACTIVE){
             session_start();
         }
-        $user = $_SESSION['user'];
-        unset($_SESSION['user']);
-        $user = $daoUser->getFullById($user->get_id());
-        $_SESSION['user'] = $user;
+        $user = null;
+        if (isset($_SESSION['user'])) {
+            $user = $_SESSION['user'];
+            unset($_SESSION['user']);
+            $user = $daoUser->getFullById($user->get_id());
+            $_SESSION['user'] = $user;
+        }
 
         $specialities = $daoSpeciality->getSpecialities();
         $img_account = "/assets/img/";
-        require_once PATH_VIEW . "vaccount.php";
+
+        if ($user != null)  $ajax["user"] = $user->userToArray();
+        else                $ajax["user"] = null;
+        $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
+        $ajax["html"] = file_get_contents(PATH_VIEW . "vaccount.html");
+
+        print_r(json_encode($ajax));
+
+        // require_once PATH_VIEW . "vaccount.php";
     }
 
     public function getAccountEditResult() {
@@ -254,5 +266,27 @@ class  cntrlLogin {
             require  PATH_VIEW . "vmconnection.php";
             return;
         }
-    } 
+    }
+
+    public function getUser() {
+        $ajax   = [];
+        $daoUser        = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
+        $daoSpeciality  = new DaoSpeciality(DBHOST, DBNAME, PORT, USER, PASS);
+
+        $user = null;
+        if (isset($_SESSION['user'])) {
+            $user = $_SESSION['user'];
+            unset($_SESSION['user']);
+            $user = $daoUser->getFullById($user->get_id());
+            $_SESSION['user'] = $user;
+        }
+
+        $specialities = $daoSpeciality->getSpecialities();
+        $img_account = "/assets/img/";
+
+        if ($user != null)  $ajax["user"] = $user->userToArray();
+        else                $ajax["user"] = null;
+
+        print_r(json_encode($ajax));
+    }
 }

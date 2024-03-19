@@ -65,6 +65,19 @@ class Place {
     public function set_city(City $city){
         $this->city = $city;
     }
+
+    public function placeToArray() : array {
+        $place = [];
+
+        $place["id"]            = $this->id;
+        $place["name"]          = $this->name;
+        $place["num_street"]    = $this->num_street;
+        $place["street"]        = $this->street;
+        $place["code_insee"]    = $this->code_insee;
+        $place["city"]          = $this->city;
+
+        return $place;
+    }
 }
 
 

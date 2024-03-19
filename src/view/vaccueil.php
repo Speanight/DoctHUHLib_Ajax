@@ -1,5 +1,5 @@
 <?php 
-require_once "header.php";
+require_once "header.html";
 ?>
 <link rel="stylesheet" href="/src/css/accueil.css">
 <div class="corpse"> <!-- Content area-->

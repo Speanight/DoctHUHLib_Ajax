@@ -39,6 +39,7 @@ if ($method == "GET") {
     elseif ($uri == "/disconnect")          $cntrlLogin->getDisconnect();
     elseif($uri == "/debug")                $utils->constructSession(12);
     elseif($uri == "/espacedoc/creation")   $cntrlLogin->getDocConnectionForm();
+    elseif ($uri == "/user")                $cntrlLogin->getUser();
     else $cntrlLogin->getConnectionForm();
 }
 elseif ($method == "POST") {

@@ -103,4 +103,19 @@ class User {
         }
         else return false;
     }
+
+    public function userToArray() : array {
+        $user = [];
+
+        $user["id"] = $this->id;
+        $user["name"] = $this->name;
+        $user["surname"] = $this->surname;
+        $user["phone"] = $this->phone;
+        $user["mail"] = $this->mail;
+        $user["picture"] = $this->picture;
+        if (isset($this->place)) $user["place"] = $this->place->placeToArray();
+        if (isset($this->speciality)) $user["speciality"] = $this->speciality->specialityToArray();
+
+        return $user;
+    }
 }

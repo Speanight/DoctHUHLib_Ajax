@@ -34,4 +34,13 @@ class City {
         $this->code_postal = $code_postal;
     }
 
+    public function cityToArray() : array {
+        $city = [];
+
+        $city["code_insee"]     = $this->code_insee;
+        $city["city"]           = $this->city;
+        $city["code_postal"]    = $this->code_postal;
+
+        return $city;
+    }
 }

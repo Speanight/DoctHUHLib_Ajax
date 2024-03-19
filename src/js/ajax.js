@@ -9,6 +9,7 @@
 function ajaxRequest(type, url, callback, data = null)
 {
   let xhr;
+  console.log(url);
 
   // Create XML HTTP request.
   xhr = new XMLHttpRequest();
@@ -63,3 +64,66 @@ function httpErrors(errorCode)
     }, 5000);
   }
 }
+
+function displayPage(data) {
+  let page = data["header"] + data["html"];
+  let user = data["user"];
+  console.log(user);
+  document.open();
+  document.write(page);
+  document.close();
+
+  hideElementUser(data);
+}
+
+function hideElementUser(data) {
+  user = data["user"];
+
+  let domNone = document.getElementsByClassName("user-none");
+  let domPatient = document.getElementsByClassName("user-patient");
+  let domPracticien = document.getElementsByClassName("user-practicien");
+
+  if (user == null) {
+    for (let i = 0; i < domPatient.length; i++) {
+      domPatient[i].style.display = "none";
+    }
+
+    for (let i = 0; i < domPracticien.length; i++) {
+      domPracticien[i].style.display = "none";
+    }
+
+    for (let i = 0; i < domNone.length; i++) {
+      domNone[i].style.display = "block";
+    }
+  }
+  else {
+    if (user["place"] === undefined) {
+      for (let i = 0; i < domPracticien.length; i++) {
+        domPracticien[i].style.display = "none";
+      }
+  
+      for (let i = 0; i < domNone.length; i++) {
+        domNone[i].style.display = "none";
+      }
+      
+      for (let i = 0; i < domPatient.length; i++) {
+        domPatient[i].style.display = "block";
+      }
+    }
+    else {
+      for (let i = 0; i < domNone.length; i++) {
+        domNone[i].style.display = "none";
+      }
+      
+      for (let i = 0; i < domPatient.length; i++) {
+        domPatient[i].style.display = "none";
+      }
+
+      for (let i = 0; i < domPracticien.length; i++) {
+        domPracticien[i].style.display = "block";
+      }
+    }
+  }
+}
+
+ajaxRequest("GET", "/user", hideElementUser);
