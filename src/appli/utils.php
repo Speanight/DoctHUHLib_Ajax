@@ -201,5 +201,14 @@ class Utils {
 
         return $bilan;
     }
+    public function isConnected(){
+        $user = $_SESSION["user"];
+        if(isset($user)){
+            $this->savePicture($user->get_id(), "img", "assets/img/");
+            return true;
+        }
+        else{ return false;
+        }
+    }
 }
 
