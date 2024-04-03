@@ -32,7 +32,7 @@ else                            $user = null;
 if ($method == "GET") {
     if ($uri == "/")                        $cntrlApp->getAccueil();
     elseif ($uri == "/login")               $cntrlLogin->getConnectionForm();
-    elseif ($uri == "/rendezvous")         $cntrlApp->getRendezVous();
+    elseif ($uri == "/rendezvous")          $cntrlApp->getRendezVous();
     elseif($uri == "/espacedoc")            $cntrlApp->getDocPage();
     elseif ($uri == "/account")             $cntrlLogin->getAccountEdit();
     elseif ($uri == "/pastmeetings")        $cntrlApp->getPastMeetings();

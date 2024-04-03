@@ -108,11 +108,11 @@ class User {
         $user = [];
 
         $user["id"] = $this->id;
-        $user["name"] = $this->name;
-        $user["surname"] = $this->surname;
+        $user["name"] = ucfirst($this->name);
+        $user["surname"] = strtoupper($this->surname);
         $user["phone"] = $this->phone;
         $user["mail"] = $this->mail;
-        $user["picture"] = $this->picture;
+        $user["picture"] = "/assets/img/" . $this->picture;
         if (isset($this->place)) $user["place"] = $this->place->placeToArray();
         if (isset($this->speciality)) $user["speciality"] = $this->speciality->specialityToArray();
 
