@@ -32,4 +32,16 @@ class Week {
     public function setEnd($end) : void {
         $this->end = $end;
     }
+
+    public function timeToArray() : array {
+        $week = [];
+        $week["begin"] = $this->begin->format("Y-m-d H:i:s");       
+        $week["end"] = $this->end->format("Y-m-d H:i:s");
+        $week["days"] = [];
+        foreach($this->days as $day){
+            array_push($week["days"], $day->format("Y-m-d H:i:s"));
+        }
+        return $week;
+
+    }
 }
