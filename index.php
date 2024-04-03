@@ -32,13 +32,14 @@ else                            $user = null;
 if ($method == "GET") {
     if ($uri == "/")                        $cntrlApp->getAccueil();
     elseif ($uri == "/login")               $cntrlLogin->getConnectionForm();
-    elseif ($uri == "/rendezvous")         $cntrlApp->getRendezVous();
+    elseif ($uri == "/rendezvous")          $cntrlApp->getRendezVous();
     elseif($uri == "/espacedoc")            $cntrlApp->getDocPage();
     elseif ($uri == "/account")             $cntrlLogin->getAccountEdit();
     elseif ($uri == "/pastmeetings")        $cntrlApp->getPastMeetings();
     elseif ($uri == "/disconnect")          $cntrlLogin->getDisconnect();
     elseif($uri == "/debug")                $utils->constructSession(12);
     elseif($uri == "/espacedoc/creation")   $cntrlLogin->getDocConnectionForm();
+    elseif ($uri == "/user")                $cntrlLogin->getUser();
     else $cntrlLogin->getConnectionForm();
 }
 elseif ($method == "POST") {

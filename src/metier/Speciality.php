@@ -23,4 +23,13 @@ class Speciality {
     public function set_type(string $type) {
         $this->type = $type;
     }
+
+    public function specialityToArray() : array {
+        $speciality = [];
+
+        $speciality["id"] = $this->id;
+        $speciality["type"] = $this->type;
+
+        return $speciality;
+    }
 }

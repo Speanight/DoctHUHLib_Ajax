@@ -9,6 +9,7 @@
 function ajaxRequest(type, url, callback, data = null)
 {
   let xhr;
+  console.log(url);
 
   // Create XML HTTP request.
   xhr = new XMLHttpRequest();
@@ -63,3 +64,110 @@ function httpErrors(errorCode)
     }, 5000);
   }
 }
+
+function displayPage(data) {
+  let page = data["header"] + data["html"];
+  let user = data["user"];
+  console.log(user);
+  document.open();
+  document.write(page);
+  document.close();
+
+  displayDatas(user);
+  hideElementUser(data);
+}
+
+function displayDatas(user) {
+  let fullname = document.getElementsByClassName("user-fullname");
+  for (let i = 0; i < fullname.length; i++) {
+    fullname[i].innerHTML = user["surname"] + " " + user["name"];
+  }
+
+  let photo = document.getElementsByClassName("user-picture");
+  for (let i = 0; i < photo.length; i++) {
+    photo[i].src = user["picture"];
+  }
+
+  for (const key in user) {
+    displayUserData(user, key);
+  }
+}
+
+/*
+Function used by displayUserDatas (with an 'S') to avoid repetition.
+It searches the whole page for classes called "user-" + data,
+where data is the data it searches for.
+
+A typical use for this would be something like this:
+We want to show the name of the user in specific places on the web page.
+
+Therefor we need to get the "name" element from user:
+We can call the function with displayUserData(user, "name");
+This will cause the function to display the name in every HTML element that has
+"user-name" in its class.
+*/
+function displayUserData(user, data) {
+  let elements = document.getElementsByClassName("user-" + data);
+  console.log(elements);
+  console.log(data);
+  for (let i = 0; i < elements.length; i++) {
+    if (elements[i].nodeName === "INPUT") {
+      elements[i].value = user[data];
+    }
+    else {
+      elements[i].value = user[data];
+    }
+  }
+}
+
+function hideElementUser(data) {
+  user = data["user"];
+
+  let domNone = document.getElementsByClassName("user-none");
+  let domPatient = document.getElementsByClassName("user-patient");
+  let domPracticien = document.getElementsByClassName("user-practicien");
+
+  if (user == null) {
+    for (let i = 0; i < domPatient.length; i++) {
+      domPatient[i].style.display = "none";
+    }
+
+    for (let i = 0; i < domPracticien.length; i++) {
+      domPracticien[i].style.display = "none";
+    }
+
+    for (let i = 0; i < domNone.length; i++) {
+      domNone[i].style.display = "block";
+    }
+  }
+  else {
+    if (user["place"] === undefined) {
+      for (let i = 0; i < domPracticien.length; i++) {
+        domPracticien[i].style.display = "none";
+      }
+  
+      for (let i = 0; i < domNone.length; i++) {
+        domNone[i].style.display = "none";
+      }
+      
+      for (let i = 0; i < domPatient.length; i++) {
+        domPatient[i].style.display = "block";
+      }
+    }
+    else {
+      for (let i = 0; i < domNone.length; i++) {
+        domNone[i].style.display = "none";
+      }
+      
+      for (let i = 0; i < domPatient.length; i++) {
+        domPatient[i].style.display = "none";
+      }
+
+      for (let i = 0; i < domPracticien.length; i++) {
+        domPracticien[i].style.display = "block";
+      }
+    }
+  }
+}
+
+ajaxRequest("GET", "/user", hideElementUser);

@@ -1,6 +1,3 @@
-<?php 
-require_once "header.php";
-?>
 <link rel="stylesheet" href="/src/css/accueil.css">
 <script src="/src/js/editAccount.js" defer></script>
 <div class="corpse"> <!-- Content area-->
@@ -14,12 +11,12 @@ require_once "header.php";
                 <div class="col">
                     <div class="mb-3">
                         <label for="phone" class="form-label">E-mail</label>
-                        <input type="email" name="email" class="form-control" id="email" value="<?=$user->get_mail()?>">
+                        <input type="email" name="email" class="form-control user-mail" id="email" value="<?=$user->get_mail()?>">
                     </div>
 
                     <div class="mb-3">
                         <label for="phone" class="form-label">N° de téléphone</label>
-                        <input type="tel" name="phone" class="form-control" id="phone" value="<?=$user->get_phone()?>">
+                        <input type="tel" name="phone" class="form-control user-phone" id="phone" value="<?=$user->get_phone()?>">
                     </div>
 
                     <div class="mb-3">
@@ -35,7 +32,7 @@ require_once "header.php";
 
                 <div class="col">
                     <div class="mb-3">
-                        <img src="<?=$img_account . $user->get_picture()?>" id="pfp" width=250 height=250>
+                        <img src="/assets/img/unknown.png" class="user-picture" id="pfp" width=250 height=250>
                         <input name="img" type="file" id="img" accept="image/png, image/jpeg image/jpg" />
                     </div>
                 </div>
