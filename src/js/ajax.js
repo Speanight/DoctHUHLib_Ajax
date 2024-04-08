@@ -67,19 +67,22 @@ function httpErrors(errorCode)
   }
 }
 
+
+
 function displayPage(data) { //Group header+footer and load the user datas
   let page = data["header"] + data["html"];
   let user = data["user"];
-  console.log(user);
   document.open();
   document.write(page);
   document.close();
 
-  displayDatas(user);
-  hideElementUser(data);
+  // document.addEventListener("DOMContentLoaded", function() {
+  //   displayDatas(user);
+  // }, false);
 }
 
-function displayDatas(user) {
+function displayDatas(data) {
+  let user = data["user"];
   let fullname = document.getElementsByClassName("user-fullname");
   for (let i = 0; i < fullname.length; i++) {
     fullname[i].innerHTML = user["surname"] + " " + user["name"];
@@ -92,6 +95,17 @@ function displayDatas(user) {
 
   for (const key in user) {
     displayUserData(user, key);
+  }
+
+  hideElementUser(user);
+}
+
+function displayNextMeeting(data) {
+  if (data === null) {
+    let elements = document.getElementsByClassName("meeting-not-none");
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].style.display = "none";
+    }
   }
 }
 
@@ -110,8 +124,6 @@ This will cause the function to display the name in every HTML element that has
 */
 function displayUserData(user, data) {
   let elements = document.getElementsByClassName("user-" + data);
-  console.log(elements);
-  console.log(data);
   for (let i = 0; i < elements.length; i++) {
     if (elements[i].nodeName === "INPUT") {
       elements[i].value = user[data];
@@ -122,9 +134,9 @@ function displayUserData(user, data) {
   }
 }
 
+// TODO: fix fonction hide elements.
 function hideElementUser(data) {
-  user = data["user"];
-
+  // let user = data[0];
   let domNone = document.getElementsByClassName("user-none");
   let domPatient = document.getElementsByClassName("user-patient");
   let domPracticien = document.getElementsByClassName("user-practicien");
@@ -143,7 +155,7 @@ function hideElementUser(data) {
     }
   }
   else {
-    if (user["place"] === undefined) {
+    if (user[0]["speciality"] === undefined) {
       for (let i = 0; i < domPracticien.length; i++) {
         domPracticien[i].style.display = "none";
       }
@@ -183,14 +195,20 @@ function loadSantePage(data){
 }
 function loadAccueil(data){
   displayPage(data);
-  hideElementUser(data);
+  
+  document.addEventListener("DOMContentLoaded", function() {
+    // displayDatas(data);
+  }, false);
 }
 function loadMedecinPage(data){
   console.log("page médecin chargée");
 
 }
 
-ajaxRequest("GET", "/user", hideElementUser);
+document.addEventListener("DOMContentLoaded", function() {
+  ajaxRequest("GET", "/user", displayDatas);
+  ajaxRequest("GET", "/meeting/next", displayNextMeeting);
+})
 
 //Avoid recursive load of ajax.js hence an epileptic loading page
 if (document.getElementById("initialLoad") !== null) {

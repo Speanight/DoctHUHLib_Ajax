@@ -285,4 +285,12 @@ class cntrlApp {
 
         require PATH_VIEW . "vrendezvous.php";
     }
+
+
+    public function getNextMeeting() {
+        $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
+        $user = $_SESSION['user'];
+
+        print_r(json_encode($daoMeeting->getNextMeeting($user)));
+    }
 }
