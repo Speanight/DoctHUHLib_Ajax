@@ -41,6 +41,7 @@ if ($method == "GET") {
     elseif($uri == "/espacedoc/creation")   $cntrlLogin->getDocConnectionForm();
     elseif ($uri == "/user")                $cntrlLogin->getUser();
     elseif ($uri == "/accueil")             $cntrlApp->getAccueil();
+    elseif ($uri == "/meeting/next")        $cntrlApp->getNextMeeting();
     else $cntrlLogin->getConnectionForm();
 }
 elseif ($method == "POST") {

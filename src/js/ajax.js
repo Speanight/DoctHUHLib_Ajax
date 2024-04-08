@@ -27,7 +27,7 @@ function ajaxRequest(type, url, callback, data = null)
     {
       case 200:
       case 201:
-        // console.log(xhr.responseText);
+        console.log(xhr.responseText);
         callback(JSON.parse(xhr.responseText));
         break;
       default:
@@ -76,15 +76,14 @@ function displayPage(data) { //Group header+footer and load the user datas
   document.write(page);
   document.close();
 
-  document.addEventListener("DOMContentLoaded", function() {
-    displayDatas(user);
-    hideElementUser(data);
-  }, false);
+  // document.addEventListener("DOMContentLoaded", function() {
+  //   displayDatas(user);
+  // }, false);
 }
 
-function displayDatas(user) {
+function displayDatas(data) {
+  let user = data["user"];
   let fullname = document.getElementsByClassName("user-fullname");
-  console.log(fullname);
   for (let i = 0; i < fullname.length; i++) {
     fullname[i].innerHTML = user["surname"] + " " + user["name"];
   }
@@ -96,6 +95,17 @@ function displayDatas(user) {
 
   for (const key in user) {
     displayUserData(user, key);
+  }
+
+  hideElementUser(user);
+}
+
+function displayNextMeeting(data) {
+  if (data === null) {
+    let elements = document.getElementsByClassName("meeting-not-none");
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].style.display = "none";
+    }
   }
 }
 
@@ -124,9 +134,9 @@ function displayUserData(user, data) {
   }
 }
 
+// TODO: fix fonction hide elements.
 function hideElementUser(data) {
-  user = data["user"];
-
+  // let user = data[0];
   let domNone = document.getElementsByClassName("user-none");
   let domPatient = document.getElementsByClassName("user-patient");
   let domPracticien = document.getElementsByClassName("user-practicien");
@@ -145,7 +155,7 @@ function hideElementUser(data) {
     }
   }
   else {
-    if (user["place"] === undefined) {
+    if (user[0]["speciality"] === undefined) {
       for (let i = 0; i < domPracticien.length; i++) {
         domPracticien[i].style.display = "none";
       }
@@ -183,13 +193,20 @@ console.log("page santé chargée");
 }
 function loadAccueil(data){
   displayPage(data);
+  
+  document.addEventListener("DOMContentLoaded", function() {
+    // displayDatas(data);
+  }, false);
 }
 function loadMedecinPage(data){
   console.log("page médecin chargée");
 
 }
 
-ajaxRequest("GET", "/user", hideElementUser);
+document.addEventListener("DOMContentLoaded", function() {
+  ajaxRequest("GET", "/user", displayDatas);
+  ajaxRequest("GET", "/meeting/next", displayNextMeeting);
+})
 
 //Avoid recursive load of ajax.js hence an epileptic loading page
 if (document.getElementById("initialLoad") !== null) {

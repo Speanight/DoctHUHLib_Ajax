@@ -17,7 +17,6 @@ class cntrlApp {
         }
         $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
         $ajax["html"] = file_get_contents(PATH_VIEW . "vaccueil.html");
-        $ajax["user"] = $user->userToArray();
 
         print_r(json_encode($ajax));
     }
@@ -283,5 +282,13 @@ class cntrlApp {
         }
 
         require PATH_VIEW . "vrendezvous.php";
+    }
+
+
+    public function getNextMeeting() {
+        $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
+        $user = $_SESSION['user'];
+
+        print_r(json_encode($daoMeeting->getNextMeeting($user)));
     }
 }
