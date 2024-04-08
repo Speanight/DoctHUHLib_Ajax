@@ -1,3 +1,4 @@
+
 //------------------------------------------------------------------------------
 //--- ajaxRequest --------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -6,6 +7,7 @@
 // \param url The url with the data.
 // \param callback The callback to call where the request is successful.
 // \param data The data associated with the request.
+
 function ajaxRequest(type, url, callback, data = null)
 {
   let xhr;
@@ -177,19 +179,19 @@ function hideElementUser(data) {
 //------------------------------------------------------------------------------
 // List of functions that loads the corresponding page
 function loadSantePage(data){
-
+console.log("page santé chargée");
 }
-
-//TODO Fixer la fonciton loadAccueil. Le problème est que la page d'acceuil et la page par défaut !! Il faut donc créer une page index.html qui contient la page accueil
 function loadAccueil(data){
-  console.log(data);
   displayPage(data);
 }
-
 function loadMedecinPage(data){
+  console.log("page médecin chargée");
 
 }
 
+ajaxRequest("GET", "/user", hideElementUser);
+
+//Avoid recursive load of ajax.js hence an epileptic loading page
 if (document.getElementById("initialLoad") !== null) {
   ajaxRequest("GET", "/accueil", loadAccueil);
 }
@@ -198,7 +200,13 @@ if (document.getElementById("initialLoad") !== null) {
 //--- Page event redirection block ---------------------------------------------------------------
 //------------------------------------------------------------------------------
 // Call the correct function to load the clicked page
-document.getElementById("acButton").addEventListener("click", ajaxRequest, "GET", "/accueil", loadAccueil);
-document.getElementById("titleButton").addEventListener("click", loadAccueil)
-document.getElementById("esButton").addEventListener("click", loadSantePage)
-document.getElementById("epButton").addEventListener("click", loadMedecinPage)
+document.getElementById("acButton").addEventListener("click", () => {
+    ajaxRequest("GET", "/accueil", loadAccueil);
+});
+document.getElementById("titleButton").addEventListener("click", () => {
+    ajaxRequest("GET", "/accueil", loadAccueil);
+
+});
+document.getElementById("esButton").addEventListener("click", loadSantePage);
+document.getElementById("epButton").addEventListener("click", loadMedecinPage);
+
