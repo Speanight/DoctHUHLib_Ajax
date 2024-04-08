@@ -17,6 +17,7 @@ class cntrlApp {
         }
         $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
         $ajax["html"] = file_get_contents(PATH_VIEW . "vaccueil.html");
+        $ajax["user"] = $user->userToArray();
 
         print_r(json_encode($ajax));
     }
