@@ -177,7 +177,9 @@ function hideElementUser(data) {
 //------------------------------------------------------------------------------
 // List of functions that loads the corresponding page
 function loadSantePage(data){
-console.log("page santé chargée");
+  console.log("page santé chargée");
+  displayPage(data)
+  hideElementUser(data)
 }
 function loadAccueil(data){
   displayPage(data);
@@ -206,6 +208,9 @@ document.getElementById("titleButton").addEventListener("click", () => {
     ajaxRequest("GET", "/accueil", loadAccueil);
 
 });
-document.getElementById("esButton").addEventListener("click", loadSantePage);
+document.getElementById("esButton").addEventListener("click", () => {
+  //TODO Check if user is connected. If not, redirect directly to the vconnectioN.php page to execute the php code. If connected, launch the request below
+  ajaxRequest("GET", "/rendezvous", loadSantePage);
+});
 document.getElementById("epButton").addEventListener("click", loadMedecinPage);
 

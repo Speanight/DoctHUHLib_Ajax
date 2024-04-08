@@ -37,8 +37,10 @@ class cntrlApp {
                 if ($meeting->get_beginning() < $today) array_push($pastMeetings, $meeting);
                 else                                    array_unshift($futureMeetings, $meeting);
             }
+            $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
+            $ajax["html"] = file_get_contents(PATH_VIEW . "vrendezvous.html");
+            print_r(json_encode($ajax));
 
-            require PATH_VIEW . "vrendezvous.php";
         }
         else require PATH_VIEW . "vconnection.php";
     }
