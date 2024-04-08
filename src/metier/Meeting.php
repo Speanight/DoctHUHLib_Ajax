@@ -15,6 +15,19 @@ class Meeting {
         $this->user         = $user;
     }
 
+    public function meetingToArray(){
+        $meeting = [];
+
+        $meeting["id"] = $this->id;
+        $meeting["beginning"] = $this->beginning->format("Y-m-d H:i:s");
+        $meeting["ending"] = $this->ending->format("Y-m-d H:i:s");;
+        $meeting["place"] = $this->place;
+        $meeting["medecin"] = $this->medecin;
+        $meeting["user"] = $this->user->userToArray();
+
+        return $meeting;
+    }
+
     public function get_id() : int {
         return $this->id;
     }
@@ -63,4 +76,5 @@ class Meeting {
     public function set_user(User $user) {
         $this->user = $user;
     }
+
 }

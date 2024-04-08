@@ -4,9 +4,9 @@ $method = $_SERVER["REQUEST_METHOD"];                   // Récupération de la 
 $uri    = explode("?", $_SERVER["REQUEST_URI"])[0];     // Récupération du contexte (/...)
 
 // Uncomment this if you want to display errors on all pages.
-/* ini_set('display_errors', 1);
+ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);*/
+error_reporting(E_ALL);
 
 // Controllers.
 require_once "src/appli/cntrlLogin.php";
@@ -30,7 +30,7 @@ else                            $user = null;
 // Redirection selon l'URL
 
 if ($method == "GET") {
-    if ($uri == "/")                        $cntrlApp->getAccueil();
+    if ($uri == "/")                        require_once "index.html";
     elseif ($uri == "/login")               $cntrlLogin->getConnectionForm();
     elseif ($uri == "/rendezvous")         $cntrlApp->getRendezVous();
     elseif($uri == "/espacedoc")            $cntrlApp->getDocPage();
@@ -40,6 +40,7 @@ if ($method == "GET") {
     elseif($uri == "/debug")                $utils->constructSession(12);
     elseif($uri == "/espacedoc/creation")   $cntrlLogin->getDocConnectionForm();
     elseif ($uri == "/user")                $cntrlLogin->getUser();
+    elseif ($uri == "/accueil")             $cntrlApp->getAccueil();
     else $cntrlLogin->getConnectionForm();
 }
 elseif ($method == "POST") {
