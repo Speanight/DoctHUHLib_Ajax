@@ -288,5 +288,6 @@ class  cntrlLogin {
         else                $ajax["user"] = null;
 
         print_r(json_encode($ajax));
+        return $ajax["user"];
     }
 }

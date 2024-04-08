@@ -1,3 +1,4 @@
+
 //------------------------------------------------------------------------------
 //--- ajaxRequest --------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -6,6 +7,7 @@
 // \param url The url with the data.
 // \param callback The callback to call where the request is successful.
 // \param data The data associated with the request.
+
 function ajaxRequest(type, url, callback, data = null)
 {
   let xhr;
@@ -25,7 +27,7 @@ function ajaxRequest(type, url, callback, data = null)
     {
       case 200:
       case 201:
-        console.log(xhr.responseText);
+        // console.log(xhr.responseText);
         callback(JSON.parse(xhr.responseText));
         break;
       default:
@@ -65,20 +67,24 @@ function httpErrors(errorCode)
   }
 }
 
-function displayPage(data) {
+
+
+function displayPage(data) { //Group header+footer and load the user datas
   let page = data["header"] + data["html"];
   let user = data["user"];
-  console.log(user);
   document.open();
   document.write(page);
   document.close();
 
-  displayDatas(user);
-  hideElementUser(data);
+  document.addEventListener("DOMContentLoaded", function() {
+    displayDatas(user);
+    hideElementUser(data);
+  }, false);
 }
 
 function displayDatas(user) {
   let fullname = document.getElementsByClassName("user-fullname");
+  console.log(fullname);
   for (let i = 0; i < fullname.length; i++) {
     fullname[i].innerHTML = user["surname"] + " " + user["name"];
   }
@@ -108,8 +114,6 @@ This will cause the function to display the name in every HTML element that has
 */
 function displayUserData(user, data) {
   let elements = document.getElementsByClassName("user-" + data);
-  console.log(elements);
-  console.log(data);
   for (let i = 0; i < elements.length; i++) {
     if (elements[i].nodeName === "INPUT") {
       elements[i].value = user[data];
@@ -170,4 +174,39 @@ function hideElementUser(data) {
   }
 }
 
+//------------------------------------------------------------------------------
+//--- Loading page block ---------------------------------------------------------------
+//------------------------------------------------------------------------------
+// List of functions that loads the corresponding page
+function loadSantePage(data){
+console.log("page santé chargée");
+}
+function loadAccueil(data){
+  displayPage(data);
+}
+function loadMedecinPage(data){
+  console.log("page médecin chargée");
+
+}
+
 ajaxRequest("GET", "/user", hideElementUser);
+
+//Avoid recursive load of ajax.js hence an epileptic loading page
+if (document.getElementById("initialLoad") !== null) {
+  ajaxRequest("GET", "/accueil", loadAccueil);
+}
+
+//------------------------------------------------------------------------------
+//--- Page event redirection block ---------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Call the correct function to load the clicked page
+document.getElementById("acButton").addEventListener("click", () => {
+    ajaxRequest("GET", "/accueil", loadAccueil);
+});
+document.getElementById("titleButton").addEventListener("click", () => {
+    ajaxRequest("GET", "/accueil", loadAccueil);
+
+});
+document.getElementById("esButton").addEventListener("click", loadSantePage);
+document.getElementById("epButton").addEventListener("click", loadMedecinPage);
+

@@ -18,7 +18,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js"
         integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="/src/js/ajax.js"></script>
+    <script src="/src/js/ajax.js" defer></script>
 </head>
 
 <body>
@@ -26,28 +26,28 @@
         <div class="row flex-nowrap">
             <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg">
                 <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
-                    <a href="/" class="linkTitle d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <a id="titleButton" class="linkTitle d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                         <span class="fs-4 d-none d-sm-inline title">Doct'HUH'lib</span>
                     </a>
                     <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
                         <li class="nav-item">
-                            <a href="/" class="colorIndex link align-middle px-0">
+                            <a id="acButton" class="colorIndex link align-middle px-0">
                                 <i class="fa-solid fa-house"></i>
                                 <span class=" ms-1 d-none d-sm-inline fsblock">Accueil</span>
                             </a>
                         </li>
 
                         <li>
-                            <a href="/rendezvous" class=" colorIndex link px-0 align-middle">
+                            <a id="esButton" class=" colorIndex link px-0 align-middle">
                                 <i class="fa-solid fa-calendar-days"></i>
                                 <span class="ms-1 d-none d-sm-inline fsblock">Espace santé</span>
                             </a>
                         </li>
                         <!-- if(isset($_SESSION["user"]) && $_SESSION["user"]->isSpeInit() ){ ?> -->
                         <li class="user-practicien">
-                            <a href="/espacedoc" class="colorIndex link px-0 align-middle">
+                            <a id="epButton" class="colorIndex link px-0 align-middle">
                                 <i class="fa-solid fa-stethoscope"></i>
-                                <span class="ms-1 d-none d-sm-inline fsblock">Espace practicien</span></a>
+                                <span class="ms-1 d-none d-sm-inline fsblock" >Espace practicien</span></a>
                         </li>
                     </ul>
                     <hr>
