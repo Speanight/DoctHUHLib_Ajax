@@ -69,10 +69,10 @@ function httpErrors(errorCode)
 //--- Page event redirection block ---------------------------------------------------------------
 //------------------------------------------------------------------------------
 // Call the correct function to load the clicked page
-document.getElementById("acButton").addEventListener("click", ajaxRequest("GET", "/accueil", loadAccueil));
-document.getElementById("titleButton").addEventListener("click", loadAccueil)
-document.getElementById("esButton").addEventListener("click", loadSantePage)
-document.getElementById("epButton").addEventListener("click", loadMedecinPage)
+// document.getElementById("acButton").addEventListener("click", ajaxRequest("GET", "/accueil", loadAccueil));
+// document.getElementById("titleButton").addEventListener("click", loadAccueil)
+// document.getElementById("esButton").addEventListener("click", loadSantePage)
+// document.getElementById("epButton").addEventListener("click", loadMedecinPage)
 
 function displayPage(data) { //Group header+footer and load the user datas
   let page = data["header"] + data["html"];
@@ -191,6 +191,7 @@ function loadSantePage(data){
 function loadAccueil(data){
   console.log(data);
   displayPage(data);
+  hideElementUser(data);
 }
 
 function loadMedecinPage(data){
@@ -198,5 +199,8 @@ function loadMedecinPage(data){
 }
 
 ajaxRequest("GET", "/user", hideElementUser);
-ajaxRequest("GET", "/accueil", loadAccueil);
-console.log("prout");
+
+
+if (document.getElementById("initialLoad") !== null) {
+  ajaxRequest("GET", "/accueil", loadAccueil);
+}
