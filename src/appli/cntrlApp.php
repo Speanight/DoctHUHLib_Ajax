@@ -6,12 +6,20 @@ require_once "src/dao/DaoMeeting.php";
 
 class cntrlApp {
     public function getAccueil() {
+        $cntrlLogin = new cntrlLogin();
         if (isset($_SESSION['user'])) {
             $user = $_SESSION['user'];
             $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
             $meeting = $daoMeeting->getNextMeeting($user);
+            if(isset($meeting)){
+                $ajax["meeting"] = $meeting->meetingToArray();
+            }
         }
-        require PATH_VIEW . "vaccueil.php";
+        $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
+        $ajax["html"] = file_get_contents(PATH_VIEW . "vaccueil.html");
+        $ajax["user"] = $cntrlLogin->getUser();
+
+        print_r(json_encode($ajax));
     }
     public function getRendezVous() {
         if(isset($_SESSION["user"])){

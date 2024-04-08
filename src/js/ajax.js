@@ -65,7 +65,16 @@ function httpErrors(errorCode)
   }
 }
 
-function displayPage(data) {
+//------------------------------------------------------------------------------
+//--- Page event redirection block ---------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Call the correct function to load the clicked page
+document.getElementById("acButton").addEventListener("click", ajaxRequest("GET", "/accueil", loadAccueil));
+document.getElementById("titleButton").addEventListener("click", loadAccueil)
+document.getElementById("esButton").addEventListener("click", loadSantePage)
+document.getElementById("epButton").addEventListener("click", loadMedecinPage)
+
+function displayPage(data) { //Group header+footer and load the user datas
   let page = data["header"] + data["html"];
   let user = data["user"];
   console.log(user);
@@ -170,4 +179,24 @@ function hideElementUser(data) {
   }
 }
 
+//------------------------------------------------------------------------------
+//--- Loading page block ---------------------------------------------------------------
+//------------------------------------------------------------------------------
+// List of functions that loads the corresponding page
+function loadSantePage(data){
+
+}
+
+//TODO Fixer la fonciton loadAccueil. Le problème est que la page d'acceuil et la page par défaut !! Il faut donc créer une page index.html qui contient la page accueil
+function loadAccueil(data){
+  console.log(data);
+  displayPage(data);
+}
+
+function loadMedecinPage(data){
+
+}
+
 ajaxRequest("GET", "/user", hideElementUser);
+ajaxRequest("GET", "/accueil", loadAccueil);
+console.log("prout");
