@@ -135,15 +135,18 @@ class cntrlApp {
             $nom = explode(" ", $_POST["nom"]); //Array that separates the name from the surname. [0] => surname, [1] => name
             if(isset($nom[1])){ //The user inputed a name and a surname
                 $users = $DaoUser->getByUserSpe($nom[0], $nom[1], $specialite);
+                print_r(json_encode($users));
             }
             else{ //Tests each name and surname in cas the user inputed only one thing
                 $u1 = $DaoUser->getByUserSpe(" ", $nom[0], $specialite);
                 $u2 = $DaoUser->getByUserSpe($nom[0], " ", $specialite);
                 if(!empty($u1)){
                     $users = $u1;
+                    print_r(json_encode($users));
                 }
                 else if (!empty($u2)){
                     $users = $u2;
+                    print_r(json_encode($users));
                 }
                 elseif($specialite == "Sélectionner la spécialité") $utils->echoInfo("Aucun praticien trouvé");
             }
@@ -151,6 +154,7 @@ class cntrlApp {
         else {
             if(empty($nom)) {
                 $users = $DaoUser->getByUserSpe(" ", " ", $specialite);
+                print_r(json_encode($users));
             }
             if(empty($users)) {
                     $utils->echoInfo("Aucun practicien trouvé");
@@ -171,8 +175,7 @@ class cntrlApp {
             if ($meeting->get_beginning() < $today) array_push($pastMeetings, $meeting);
             else                                    array_push($futureMeetings, $meeting);
         }
-
-        require PATH_VIEW . "vrendezvous.php";
+        //TODO If needed (cause its a duplicata of a bit of code already executed, see getRendezVous() wich already loads the meetings), echo the pastMeetings and futureMeetings array ton insert them later with js.
     }
 
     public function dispoMedecin() {
@@ -292,5 +295,12 @@ class cntrlApp {
         $user = $_SESSION['user'];
 
         print_r(json_encode($daoMeeting->getNextMeeting($user)));
+    }
+
+    public function getSpecialities(){
+    $daoSpeciality = new DaoSpeciality(DBHOST, DBNAME, PORT, USER, PASS);
+
+
+    print_r(json_encode($daoSpeciality->getSpeciality()));
     }
 }

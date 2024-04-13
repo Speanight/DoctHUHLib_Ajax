@@ -189,7 +189,6 @@ function hideElementUser(data) {
 //------------------------------------------------------------------------------
 // List of functions that loads the corresponding page
 function loadSantePage(data){
-  console.log("page santé chargée");
   displayPage(data)
   hideElementUser(data)
 }

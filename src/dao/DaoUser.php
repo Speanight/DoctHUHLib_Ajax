@@ -173,7 +173,8 @@ class DaoUser {
         $daoSpeciality = new DaoSpeciality(DBHOST, DBNAME, PORT, USER, PASS);
 
         $surname = strtolower($surname);
-        $name = strtolower($surname);
+        $name = strtolower($name);
+
         $statement = $this->db->prepare('SELECT u.id, u.name, u.surname, u.phone, u.mail, u.picture, s.type, p.num_street, p.street, c.code_postal, c.city FROM users u
         JOIN works w ON u.id = w.id_user
         JOIN speciality s ON u.id_speciality = s.id
@@ -195,7 +196,10 @@ class DaoUser {
             $speciality = $daoSpeciality->getSpecialityOfUser($user);
             if ($place != null)         $user->set_place($place);
             if ($speciality != null)    $user->set_speciality($speciality);
-            array_push($arr, $user);
+            $arr[] = $user;
+        }
+        foreach ($arr as &$elem){
+            $elem = $elem->userToArray();
         }
         return $arr;
     }

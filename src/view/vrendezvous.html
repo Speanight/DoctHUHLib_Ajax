@@ -3,7 +3,7 @@ $DaoSpeciality = new DaoSpeciality(DBHOST, DBNAME, PORT, USER, PASS);
 $speArray = $DaoSpeciality->getSpeciality();
 ?>-->
 <link rel="stylesheet" type="text/css" href="/src/css/rendezvous.css">
-<script src="/src/js/vrendezvous.js"></script>
+<script src="/src/js/vrendezvous.js" defer></script>
 
 
 
@@ -17,23 +17,15 @@ $speArray = $DaoSpeciality->getSpeciality();
             <h3>Chercher un practicien</h3>
             <hr>
             <div>
-                <form id="alignement" action="/rendezvous/result" method="POST">
+                <div id="alignement">
                     <div class="form-group">
-                        <span class="innerItem"> <i class="fa-solid fa-magnifying-glass"></i> <input type="text" name="nom" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Nom prénom..."/></span>
+                        <span class="innerItem"> <i class="fa-solid fa-magnifying-glass"></i> <input id="inputName" type="text" name="nom" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Nom prénom..."/></span>
                     </div>
-                    <select class="form-select form-override" aria-label="Default select example" name="specialite">
+                    <select id="selectSpe" class="form-select form-override" aria-label="Default select example" name="specialite">
                         <option selected>Sélectionner la spécialité</option>
-                        <!-- Will output all the specialities from the db in the select menu
-                        <?php
-                            if(isset($speArray)){
-                                foreach ($speArray as $s){
-                        ?>
-                        <option name="<?=$s["type"]?>" value="<?= $s["type"] ?>"> <?=$s["type"]?> </option>
-                        <?php }
-                            }?>-->
                     </select>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+                    <button id="searchDoc" type="button" class="btn btn-primary">Rechercher</button>
+                </div>
             </div>
 
             <!--<?php if (!empty($users[0])) { ?>

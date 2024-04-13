@@ -42,6 +42,7 @@ if ($method == "GET") {
     elseif ($uri == "/user")                $cntrlLogin->getUser();
     elseif ($uri == "/accueil")             $cntrlApp->getAccueil();
     elseif ($uri == "/meeting/next")        $cntrlApp->getNextMeeting();
+    elseif ($uri == "/specialities")        $cntrlApp->getSpecialities();
     else $cntrlLogin->getConnectionForm();
 }
 elseif ($method == "POST") {
