@@ -43,12 +43,12 @@ if ($method == "GET") {
     elseif ($uri == "/accueil")             $cntrlApp->getAccueil();
     elseif ($uri == "/meeting/next")        $cntrlApp->getNextMeeting();
     elseif ($uri == "/specialities")        $cntrlApp->getSpecialities();
+    elseif ($uri == "/rendezvous/result")   $cntrlApp->getMedecin();
     else $cntrlLogin->getConnectionForm();
 }
 elseif ($method == "POST") {
     if ($uri == "/login/result")                            $cntrlLogin->getLoginResult();
     elseif ($uri == "/register/result")                     $cntrlLogin->getRegisterResult();
-    elseif ($uri == "/rendezvous/result")                   $cntrlApp->getMedecin();
     elseif ($uri === "/disconnect")                         $utils->destructSession();
     elseif ($uri == "/rendezvous/medecin/disponibilites")   $cntrlApp->dispoMedecin();
     elseif ($uri == "/rendezvous/medecin/result")           $cntrlApp->userReservation();

@@ -26,8 +26,8 @@ class Utils {
         }
         return $string;
     }
-    public function echoSuccess($needle){
-        echo '
+    public function echoSuccess($needle) : string{
+        return '
             <div class="errorWrapper">
                   <div class="alert alert-success alert-dismissible d-flex align-items-center fade show">
                         <i class="bi-check-circle-fill"></i>
@@ -38,7 +38,7 @@ class Utils {
         ';
     }
     public function echoError($needle){
-        echo '
+        return '
                 <div class="errorWrapper">
                     <div class="alert alert-danger alert-dismissible d-flex align-items-center fade show">
                         <i class="bi-exclamation-octagon-fill"></i>
@@ -49,7 +49,7 @@ class Utils {
         ';
     }
     public function echoWarning($needle){
-        echo '
+        return '
              <div class="errorWrapper">
                 <div class="alert alert-warning alert-dismissible d-flex align-items-center fade show">
                     <i class="bi-exclamation-triangle-fill"></i>
@@ -61,7 +61,7 @@ class Utils {
     }
 
     public function echoInfo($needle){
-        echo '
+        return '
              <div class="errorWrapper">
                 <div class="alert alert-info alert-dismissible d-flex align-items-center fade show">
                     <i class="bi-info-circle-fill"></i>

@@ -109,7 +109,7 @@ function displayNextMeeting(data) {
   }
 }
 
-/*
+/**
 Function used by displayUserDatas (with an 'S') to avoid repetition.
 It searches the whole page for classes called "user-" + data,
 where data is the data it searches for.
@@ -182,6 +182,32 @@ function hideElementUser(data) {
       }
     }
   }
+}
+//------------------------------------------------------------------------------
+//--- Utils func ---------------------------------------------------------------
+//------------------------------------------------------------------------------
+// A list of specific utilities function that are not natively implemented in JavaScript
+function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * This function check if the backend sent back an error/warning/info message and print it to the current page.
+ * It can be called each time you expect a potential return message. Don't forget to do an early return
+ * @param {array} data - The JSON decoded array returned by the backend.
+ * @returns {boolean} True if there is a message, False otherwise
+ */
+function checkErrorMessage(data){
+  if('message' in data){
+    document.body.insertAdjacentHTML("afterend", data["message"]);
+    setTimeout( () => {
+      Array.from(document.getElementsByClassName("errorWrapper")).forEach((elem) => {
+        elem.remove();
+      });
+    }, 3000);
+
+  }
+  return 'message' in data;
 }
 
 //------------------------------------------------------------------------------

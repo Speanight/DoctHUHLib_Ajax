@@ -28,7 +28,7 @@ $speArray = $DaoSpeciality->getSpeciality();
                 </div>
             </div>
 
-            <!--<?php if (!empty($users[0])) { ?>
+            <!--<?php if (!empty($users[0])) { ?> -->
             <table class="table align-middle mb-0 bg-white">
                 <thead class="bg-light">
                 <tr>
@@ -39,45 +39,10 @@ $speArray = $DaoSpeciality->getSpeciality();
                     <th></th>
                 </tr>
                 </thead>
-                <tbody>
-                <?php foreach ($users as $u) { ?>
-                <form method="POST" action="/rendezvous/medecin/disponibilites">
-                    <tr>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <img
-                                        src="/assets/img/<?=$u->get_picture()?>"
-                                        alt=""
-                                        style="width: 45px; height: 45px"
-                                        class="rounded-circle"
-                                />
-                                <div class="ms-3">
-                                    <p class="fw-bold mb-1"><?=ucfirst($u->get_name()) . " " . strtoupper($u->get_surname())?></p>
-                                    <p class="text-muted mb-0"><?=$u->get_mail()?> </p>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <p class="fw-normal mb-1"><?= $u->get_speciality()->get_type()?></p>
-                        </td>
-                        <td>
-                            <?= $u->get_phone()?>
-                        </td>
-                        <td>
-                            <p class="fw-normal mb-1"><?= $u->get_place()->get_name()?> </p>
-                            <p class="fw-normal mb-0"><?= $u->get_place()->get_num_street() . " " . ucfirst($u->get_place()->get_street())?></p>
-                            <p class="text-muted mb-0"><?= $u->get_place()->get_city()->get_code_postal() . " " . ucfirst($u->get_place()->get_city()->get_city())?></p>
-                        </td>
-                        <td>
-                            <input type="text" name="idMedecin" value="<?=$u->get_id()?>" hidden>
-                            <button type="submit" class="btn btn-primary">Prendre rendez-vous</button>
-                        </td>
-                    </tr>
-                </form>
-                <?php } ?>
+                <tbody id="cardZone">
+
                 </tbody>
             </table>
-            <?php } ?>-->
         </div>
 
 
@@ -161,8 +126,6 @@ $speArray = $DaoSpeciality->getSpeciality();
         </div>
         <?php } ?>
     </div>-->
-
-
 
 </div>
 </div>
