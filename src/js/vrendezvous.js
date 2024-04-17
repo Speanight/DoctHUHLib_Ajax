@@ -13,11 +13,19 @@ function insertDoctors(data){
     if(checkErrorMessage(data)) return;
 
     data.forEach((elem) => {
-        printDoctors(elem.name, elem.surname, elem.picture, elem.speciality.type, elem.phone, elem.mail, elem.place.name, elem.place.num_street, elem.place.street, elem.place.city.code_postal, elem.place.city.city )
+        printDoctors(elem.id, elem.name, elem.surname, elem.picture, elem.speciality.type, elem.phone, elem.mail, elem.place.name, elem.place.num_street, elem.place.street, elem.place.city.code_postal, elem.place.city.city )
     });
+
+    let buttons = document.getElementsByClassName("btn-rdv-medecin");
+
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", () => {
+            ajaxRequest("GET", "/rendezvous/medecin/disponibilites", displayMedecinMeetings, "id=" + buttons[i].previousElementSibling.value);
+        })
+    }
 }
 
-function printDoctors(name, surname, picture, speciality, phone, mail, facilityName, streetNumber, street, postalCode, cityName){
+function printDoctors(id, name, surname, picture, speciality, phone, mail, facilityName, streetNumber, street, postalCode, cityName){
     let cardZone = document.getElementById("cardZone");
     let fullName = capitalizeFirstLetter(name) + " " + surname.toUpperCase();
     let fullStreet = streetNumber + " " + capitalizeFirstLetter(street)
@@ -50,8 +58,8 @@ function printDoctors(name, surname, picture, speciality, phone, mail, facilityN
             <p class="text-muted mb-0">${fullCity}</p>
         </td>
         <td>
-            <input type="text" name="idMedecin" value="<?=$u->get_id()?>" hidden>
-                <button type="submit" class="btn btn-primary">Prendre rendez-vous</button>
+            <input type="text" name="idMedecin" value="${id}" hidden>
+            <button type="submit" class="btn btn-primary btn-rdv-medecin">Prendre rendez-vous</button>
         </td>
     </tr> `
 
@@ -72,8 +80,6 @@ document.getElementById("searchDoc").addEventListener("click", () => {
     let spe = document.getElementById("selectSpe").value;
     let name = document.getElementById("inputName").value;
     ajaxRequest("GET", "/rendezvous/result", insertDoctors, "specialite="+spe+"&nom="+name);
+    
+    
 });
-
-
-
-

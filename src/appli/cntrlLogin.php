@@ -15,7 +15,7 @@ class  cntrlLogin {
         if (isset($_SESSION['user'])) {
             $utils = new Utils();
             $utils->echoInfo("Vous êtes déjà connecté ! Redirection sur l'accueil");
-            require PATH_VIEW . "vaccueil.php";
+            require PATH_VIEW . "vaccueil.html";
         }
         else {
             require PATH_VIEW . "vconnection.php";
@@ -137,7 +137,6 @@ class  cntrlLogin {
         $ajax["html"] = file_get_contents(PATH_VIEW . "vaccount.html");
 
         print_r(json_encode($ajax));
-
         // require_once PATH_VIEW . "vaccount.php";
     }
 

@@ -113,11 +113,13 @@ class User {
         $user["surname"] = strtoupper($this->surname);
         $user["phone"] = $this->phone;
         $user["mail"] = $this->mail;
-        $user["picture"] = "/assets/img/" . $this->picture;
+        $user["picture"] = $this->picture;
         if (isset($this->place)) $user["place"] = $this->place->placeToArray();
         if (isset($this->speciality)) $user["speciality"] = $this->speciality->specialityToArray();
         foreach($this->meetings as $m){
-            $meetings[] = $m->meetingToArray();
+            // print_r($m);
+            print_r(gettype($m[0]));
+            $meetings[] = $m->meetingToArray(false);
         }
         $user["meetings"] = $meetings;
 

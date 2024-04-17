@@ -189,10 +189,13 @@ class cntrlApp {
     public function dispoMedecin() {
         $user = $_SESSION['user'];
         $alerts = [];
+        $ajax = [];
+
         $daoUser = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
         $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
 
-        $idMedecin = $_POST['idMedecin'];
+        // print_r($_GET);
+        $idMedecin = $_GET['id'];
 
         $medecin = $daoUser->getFullById($idMedecin);
         $meetings = $daoMeeting->getMeetingsOfDoctor($medecin);
@@ -209,7 +212,12 @@ class cntrlApp {
         }
         $medecin->set_meetings($orderedMeetings);
 
-        require PATH_VIEW . "vhorairesMedecin.php";
+        
+        $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
+        $ajax["html"] = file_get_contents(PATH_VIEW . "vhorairesMedecin.html");
+        $ajax["medecin"] = $medecin->userToArray();
+
+        print_r(json_encode($ajax));
     }
 
     public function userReservation() {

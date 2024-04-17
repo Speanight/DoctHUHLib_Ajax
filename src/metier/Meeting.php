@@ -15,7 +15,7 @@ class Meeting {
         $this->user         = $user;
     }
 
-    public function meetingToArray(){
+    public function meetingToArray(bool $user = true){
         $meeting = [];
 
         $meeting["id"] = $this->id;
@@ -23,7 +23,7 @@ class Meeting {
         $meeting["ending"] = $this->ending->format("Y-m-d H:i:s");;
         $meeting["place"] = $this->place;
         $meeting["medecin"] = $this->medecin;
-        $meeting["user"] = $this->user->userToArray();
+        if ($user) $meeting["user"] = $this->user->userToArray();
 
         return $meeting;
     }
