@@ -51,7 +51,7 @@ function printDoctors(name, surname, picture, speciality, phone, mail, facilityN
         </td>
         <td>
             <input type="text" name="idMedecin" value="<?=$u->get_id()?>" hidden>
-                <button type="submit" class="btn btn-primary">Prendre rendez-vous</button>
+             <button type="submit" class="btn btn-primary">Prendre rendez-vous</button>
         </td>
     </tr> `
 

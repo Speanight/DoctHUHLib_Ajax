@@ -226,8 +226,8 @@ function loadAccueil(data){
   }, false);
 }
 function loadMedecinPage(data){
-  console.log("page médecin chargée");
-
+  displayPage(data)
+  hideElementUser(data)
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -249,11 +249,12 @@ document.getElementById("acButton").addEventListener("click", () => {
 });
 document.getElementById("titleButton").addEventListener("click", () => {
     ajaxRequest("GET", "/accueil", loadAccueil);
-
 });
 document.getElementById("esButton").addEventListener("click", () => {
   //TODO Check if user is connected. If not, redirect directly to the vconnectioN.php page to execute the php code. If connected, launch the request below
   ajaxRequest("GET", "/rendezvous", loadSantePage);
 });
-document.getElementById("epButton").addEventListener("click", loadMedecinPage);
+document.getElementById("epButton").addEventListener("click", () => {
+    ajaxRequest("GET", "/espacedoc", loadMedecinPage);
+});
 

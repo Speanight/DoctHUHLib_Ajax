@@ -34,6 +34,7 @@ if ($method == "GET") {
     elseif ($uri == "/login")               $cntrlLogin->getConnectionForm();
     elseif ($uri == "/rendezvous")          $cntrlApp->getRendezVous();
     elseif($uri == "/espacedoc")            $cntrlApp->getDocPage();
+    elseif($uri == "/espacedoc/context")            $cntrlApp->getDocPlanning();
     elseif ($uri == "/account")             $cntrlLogin->getAccountEdit();
     elseif ($uri == "/pastmeetings")        $cntrlApp->getPastMeetings();
     elseif ($uri == "/disconnect")          $cntrlLogin->getDisconnect();
@@ -53,7 +54,6 @@ elseif ($method == "POST") {
     elseif ($uri == "/rendezvous/medecin/disponibilites")   $cntrlApp->dispoMedecin();
     elseif ($uri == "/rendezvous/medecin/result")           $cntrlApp->userReservation();
     elseif ($uri == '/rendezvous/cancel')                   $cntrlApp->getCancelMeeting();
-    elseif($uri == '/espacedoc')                            $cntrlApp->getDocPage();
     elseif($uri == '/espacedoc/result')                     $cntrlApp->createMeeting();
     elseif($uri == '/espacedoc/creation/result')            $cntrlLogin->getRegisterDocResult();
     elseif($uri == '/espacedoc/delete')                     $cntrlApp->deleteMeeting();

@@ -45,24 +45,36 @@ class cntrlApp {
         else require PATH_VIEW . "vconnection.php";
     }
     public function getDocPage() {
+        $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
+        $ajax["html"] = file_get_contents(PATH_VIEW . "vmedecin.html");
+        print_r(json_encode($ajax));
+    }
 
+    public function getDocPlanning() {
         $DaoTimeslot = new DaoTime(DBHOST, DBNAME, PORT, USER, PASS);
         $DaoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
         $weekArray = $DaoTimeslot->getFutureWeeks();
-        if(isset($_POST["selectedWeek"]) && $_POST["selectedWeek"] != -1){
-            $currentWeek = $weekArray[$_POST["selectedWeek"]];
+        if(isset($_GET["selectedWeek"]) && $_GET["selectedWeek"] != -1){
+            $currentWeek = $weekArray[$_GET["selectedWeek"]];
         }
-        elseif(isset($_POST["persistWeek"]) && $_POST["persistWeek"] != -1){
-            $currentWeek = $weekArray[$_POST["persistWeek"]];
-            $_POST["selectedWeek"] = $_POST["persistWeek"];
+        else{
+            $currentWeek = $weekArray[0];
         }
-        else $currentWeek = $weekArray[0];
 
         $meetings = $DaoMeeting->getMeetingsOfDoctor($_SESSION["user"]);
+        foreach($meetings as &$m){
+            $m = $m->meetingToArray();
+        }
         if(!isset($utils)){
             $utils = new Utils();
         }
-        require PATH_VIEW . "vmedecin.php";
+        foreach($weekArray as &$w){
+            $w = $w->weekToArray();
+        }
+        $ajax["currentWeek"] = $currentWeek->weekToArray();
+        $ajax["meetings"] = $meetings;
+        $ajax["weekArray"] = $weekArray;
+        print_r(json_encode($ajax));
     }
     public function createMeeting(){
         $user = $_SESSION['user'];
