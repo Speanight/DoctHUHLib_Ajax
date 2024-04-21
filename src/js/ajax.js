@@ -7,7 +7,13 @@
 // \param url The url with the data.
 // \param callback The callback to call where the request is successful.
 // \param data The data associated with the request.
-
+/**
+ * Perform an AJAX request to the specified URL
+ * @param type - Request's verb (GET, POST, PUT, DELETE, UPDATE)
+ * @param url - The destination URL
+ * @param callback - The function which will treat the returned data's from the backend
+ * @param data - Specific data to append at the end of the URL (POST/GET arguments)
+ */
 function ajaxRequest(type, url, callback, data = null)
 {
   let xhr;
@@ -187,6 +193,11 @@ function hideElementUser(data) {
 //--- Utils func ---------------------------------------------------------------
 //------------------------------------------------------------------------------
 // A list of specific utilities function that are not natively implemented in JavaScript
+/**
+ * Return the inputted string with it first letter capitalized.
+ * @param str - String to parse
+ * @returns {string}
+ */
 function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
@@ -214,10 +225,19 @@ function checkErrorMessage(data){
 //--- Loading page block ---------------------------------------------------------------
 //------------------------------------------------------------------------------
 // List of functions that loads the corresponding page
+/**
+ * Load the html and header from the health search space into the current page
+ * @param data
+ */
 function loadSantePage(data){
   displayPage(data)
   hideElementUser(data)
 }
+
+/**
+ * Load the html and header for the welcome page
+ * @param data
+ */
 function loadAccueil(data){
   displayPage(data);
   

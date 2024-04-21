@@ -5,6 +5,10 @@ require_once "src/dao/DaoSpeciality.php";
 require_once "src/dao/DaoMeeting.php";
 
 class cntrlApp {
+    /**
+     * Returns the header and html of the welcome page "vaccueil.html".
+     * @return void
+     */
     public function getAccueil() {
         $cntrlLogin = new cntrlLogin();
         if (isset($_SESSION['user'])) {
@@ -21,7 +25,11 @@ class cntrlApp {
         print_r(json_encode($ajax));
     }
 
-    public function getDocPage() {
+    /**
+     * Returns the header and html of the doctor managing page "vmedecin.html".
+     * @return void
+     */
+    public function getDocPage() : void {
         $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
         $ajax["html"] = file_get_contents(PATH_VIEW . "vmedecin.html");
         print_r(json_encode($ajax));
@@ -52,6 +60,11 @@ class cntrlApp {
         else require PATH_VIEW . "vconnection.php";
     }
 
+    /**
+     * This function gathers the week selected by the user (current in time week if not specified), the meetings of the user connected,
+     * and the incoming weeks.
+     * @return void
+     */
     public function getDocPlanning() {
         $DaoTimeslot = new DaoTime(DBHOST, DBNAME, PORT, USER, PASS);
         $DaoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
@@ -78,7 +91,7 @@ class cntrlApp {
         $ajax["weekArray"] = $weekArray;
         print_r(json_encode($ajax));
     }
-    public function createMeeting(){
+    public function createMeeting() : string{
         $user = $_SESSION['user'];
         $now = new DateTime();
         $now->modify("+1 hour");
@@ -95,45 +108,51 @@ class cntrlApp {
         $ts = $_POST["timeStart"];
         $te = $_POST["timeEnd"];
         if(empty($ts) || empty($te)){
-            $utils->echoWarning("Vous devez spécifier un horaire");
-            $this->getDocPage();
-            return;
+            return $utils->echoWarning("Vous devez spécifier un horaire");
         }
 
         $beg = DateTime::createFromFormat('D. d/m/Y H:i', $date. " ".$ts);
         $end = DateTime::createFromFormat('D. d/m/Y H:i', $date. " ".$te);
         if($beg < $now){
-            $utils->echoError("Vous ne pouvez créer de rendez-vous antérieur à aujourd'hui");
-            $this->getDocPage();
-            return;
+            return $utils->echoError("Vous ne pouvez créer de rendez-vous antérieur à aujourd'hui");
         }
         if($beg >= $end){
-            $utils->echoError("Cet horaire est incorrect");
-            $this->getDocPage();
-            return;
+            return $utils->echoError("Cet horaire est incorrect");
         }
         if(!$beg || !$end){
-            $utils->echoError("Erreur lors de la création du rendez-vous");
+            return $utils->echoError("Erreur lors de la création du rendez-vous");
         }
         $isSuccess = $DaoMeeting->insertMeeting($beg, $end, $_SESSION["user"]);
         if($isSuccess){
-            $utils->echoSuccess("Rendez-vous enregistré avec succès");
+            return $utils->echoSuccess("Rendez-vous enregistré avec succès");
         }
         else {
-            $utils->echoError("Cet horaire existe déjà");
+            return $utils->echoError("Cet horaire existe déjà");
         }
-        $this->getDocPage();
-
     }
-    public function deleteMeeting(){
+
+    /**
+     * This function gathers the id of the meeting to delete and then deletes it from the database if the user who
+     * threw the call is the correct-connected user
+     * @return void
+     */
+    public function deleteMeeting() : void{
         $DaoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
+        $user = $_SESSION["user"];
         $idDoc = $_POST["idDoc"];
         $tbeg = $_POST["tbeg"];
+        if($idDoc != $user->get_id()){ //Malveolent user tried to craft a request to delete a non-propretary meeting
+            return;
+        }
         $DaoMeeting->deleteMeeting($tbeg, $idDoc);
-        $this->getDocPage();
     }
 
-    public function getMedecin(){
+    /**
+     * This function gather the name, surname and speciality searched and then checks each combinaison of [^name]/[^surname].
+     * If no user found, return an appropriate error message
+     * @return void
+     */
+    public function getMedecin() : void{
         $DaoUser = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
         $utils = new Utils();
         $specialite = $_GET["specialite"];
@@ -312,7 +331,7 @@ class cntrlApp {
     }
 
 
-    public function getNextMeeting() {
+    public function getNextMeeting() : void{
         $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
         $user = $_SESSION['user'];
 

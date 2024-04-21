@@ -10,6 +10,12 @@ dayArray[6] = "Dimanche"
 //--- Insert functions---------------------------------------------------------------
 //------------------------------------------------------------------------------
 // List of functions that treat databases result and insert the correct html
+/**
+ * This function inserts in the page every future week in the <select> tag and the days of the selected week in the <table> agenda
+ * @param {array} weeks - The JSON array containing the future weeks
+ * @param {array} currentWeek - The JSON object reflecting the selected week by the user
+ * @returns {void}
+ */
 function insertWeeks(weeks, currentWeek){
     let selectZone = document.getElementById("selectWeek");
     weeks.forEach((w, j) => {
@@ -19,13 +25,18 @@ function insertWeeks(weeks, currentWeek){
         selectZone.insertAdjacentHTML("beforeend", week);
     });
 
-    //insert the day and the date for each th of the tables
+    //insert the day and the date for each <th> of the tables
     Array.from(document.getElementsByTagName("th")).forEach((elem, j) => {
         let day = new Date(currentWeek.days[j].date);
         elem.innerHTML = dayArray[j] + " " +day.getDate().toString().padStart(2, '0') + "/" + (day.getMonth()+1).toString().padStart(2, '0');
     });
 }
 
+/**
+ * This function uses the data retrieved by the ajax request and calls the insert functions to load the context of the page
+ * @param {array} data - The JSON array containing the future weeks, the selected week and the meetings of the doctor
+ * @returns {void}
+ */
 function insertContext(data){
     insertWeeks(data["weekArray"], data["currentWeek"]);
     insertMeetings(data["meetings"]);
