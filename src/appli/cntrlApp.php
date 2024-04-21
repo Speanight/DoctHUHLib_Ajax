@@ -20,6 +20,13 @@ class cntrlApp {
 
         print_r(json_encode($ajax));
     }
+
+    public function getDocPage() {
+        $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
+        $ajax["html"] = file_get_contents(PATH_VIEW . "vmedecin.html");
+        print_r(json_encode($ajax));
+    }
+
     public function getRendezVous() {
         if(isset($_SESSION["user"])){
             $user       = $_SESSION['user'];
@@ -44,11 +51,6 @@ class cntrlApp {
         }
         else require PATH_VIEW . "vconnection.php";
     }
-    public function getDocPage() {
-        $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
-        $ajax["html"] = file_get_contents(PATH_VIEW . "vmedecin.html");
-        print_r(json_encode($ajax));
-    }
 
     public function getDocPlanning() {
         $DaoTimeslot = new DaoTime(DBHOST, DBNAME, PORT, USER, PASS);
@@ -61,7 +63,7 @@ class cntrlApp {
             $currentWeek = $weekArray[0];
         }
 
-        $meetings = $DaoMeeting->getMeetingsOfDoctor($_SESSION["user"]);
+        $meetings = $DaoMeeting->getMeetingsOfDoctor($_SESSION["user"], $currentWeek);
         foreach($meetings as &$m){
             $m = $m->meetingToArray();
         }
