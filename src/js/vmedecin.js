@@ -18,6 +18,7 @@ dayArray[6] = "Dimanche"
  */
 function insertWeeks(weeks, currentWeek){
     let selectZone = document.getElementById("selectWeek");
+    selectZone.innerHTML = "";
     weeks.forEach((w, j) => {
         let begin = new Date(w.begin.date)
         let end = new Date(w.end.date)
@@ -49,8 +50,106 @@ function loadWeek(){
     ajaxRequest("GET", "/espacedoc/context", insertContext, "selectedWeek="+weekIndex);
 }
 
-function insertMeetings(meetings){
+function clearCalendar(){
+    Array.from(document.getElementsByTagName("tbody")).forEach((elem) => {
+        elem.innerHTML = "";
+    });
+}
 
+function insertMeetings(meetings){
+    clearCalendar();
+    meetings.forEach((m, j) => {
+        let begin = new Date(m.beginning);
+        let end = new Date(m.ending);
+        let timestamp = begin.getHours().toString().padStart(2, '0')+"h"+begin.getMinutes().toString().padStart(2, "0") + " - " + end.getHours().toString().padStart(2, '0')+"h"+end.getMinutes().toString().padStart(2, "0");
+        if (m.user != null){ //Non-affected meeting
+            let fullName = capitalizeFirstLetter(m.user.name) + " " + m.user.surname;
+            var bubble = ` 
+                    <tr>
+                        <td>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="colorPatient btn btn-primary" data-toggle="modal" data-target="${"#Modal"+j}">
+                                <b><u><p style="color: #FDFBF6">${timestamp}</p></u></b>
+                                <b><p>${fullName}</p></b>
+                            </button>
+
+                                    <!-- Modal -->
+                            <div class="modal fade" id="${"Modal"+j}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Informations complémentaires</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <img
+                                                    src="/assets/img/${m.user.picture}"
+                                                    alt=""
+                                                    style="width: 90px; height: 90px; margin-bottom: 5%"
+                                                    class="rounded-circle"
+                                            />
+                                            <span class="fbContainer"><p class="frontText"> Horaire:</p> <p class="backText">${timestamp}</p></span>
+                                            <span class="fbContainer"><p class="frontText"> Patient:</p> <p class="backText">${fullName}</p></span>
+                                            <span class="fbContainer"><p class="frontText"> Numéro de téléphone:</p> <p class="backText">${m.user.phone}</p></span>
+                                            <span class="fbContainer"><p class="frontText"> Adresse mail:</p> <p class="backText">${m.user.mail}</p></span>
+                                        </div>
+                                  
+                                        <div class="modal-footer">
+                                            <div class="d-none">
+                                                <input value=${m.medecin.id}>
+                                                <input value="${m.id}">
+                                            </div>
+                                            <button type="button" class="btn btn-danger" data-mdb-ripple-init>Supprimer l'horaire</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>`
+        }
+        else { //Unaffected meeting
+            var bubble = `
+                  <tr>
+                        <td>
+                            <button type="button" class="colorFree btn btn-primary" data-toggle="modal" data-target="${"#subModal"+j}">
+                                <b><u><p>${timestamp}</p></u></b>
+                                <b><p>Libre</p></b>
+                            </button
+
+                                    <!-- Modal -->
+                            <div class="modal fade" id="${"subModal"+j}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Informations complémentaires</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Aucun patient n'a réservé ce créneau</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <div class="d-none">
+                                                <input value=${m.medecin.id}>
+                                                <input value="${m.id}">
+                                            </div>
+                                            <button type="button" class="btn btn-danger" data-mdb-ripple-init>Supprimer l'horaire</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+            `
+        }
+        let target = document.getElementById("target"+begin.getDay());
+        target.insertAdjacentHTML("beforeend", bubble)
+    });
 }
 
 //------------------------------------------------------------------------------
