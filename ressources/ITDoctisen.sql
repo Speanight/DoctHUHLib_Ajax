@@ -39253,6 +39253,7 @@ INSERT INTO works (id, id_user) VALUES
 (4, 7),
 (2, 8),
 (5, 9),
-(3, 2);
+(3, 2),
+
 
 
