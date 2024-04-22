@@ -1,4 +1,11 @@
+/**
+ * An array used to convert the position of the day in a week to its prefix.
+ * As the getDay() method starts from Sunday (Sunday => 0), a negative index is implemented to correct the starting number and allow
+ * a more casual display form Monday to Sunday.
+ * @type {any[]}
+ */
 let dayArray = Array(7);
+dayArray[-1] = "Dimanche"
 dayArray[0] = "Lundi"
 dayArray[1] = "Mardi"
 dayArray[2] = "Mercredi"
@@ -6,17 +13,63 @@ dayArray[3] = "Jeudi"
 dayArray[4] = "Vendredi"
 dayArray[5] = "Samedi"
 dayArray[6] = "Dimanche"
+
+//------------------------------------------------------------------------------
+//--- eventListener functions---------------------------------------------------------------
+//------------------------------------------------------------------------------
+// List of functions that adds listener to inserted element such as delete buttons etc...
+/**
+ * This function apply an event listener to every delete meeting button. On click, it gathers the information of the meeting
+ * stored in a hidden input and then sends them to the database for the processing. Refresh the context of the page immediately after
+ * to apply the changes to the user's page
+ * @returns {void}
+ */
+function activateDeleteButton(){
+    let buttons = Array.from(document.getElementsByClassName("delMeetingButton"))
+    buttons.forEach((b) => {
+        b.addEventListener("click", () => {
+            let selectZoneValue = document.getElementById("selectWeek").value; //used for the persistence of the selected week
+            let idDoc = b.parentNode.getElementsByTagName("input")[0].value;
+            let idMeeting = b.parentNode.getElementsByTagName("input")[1].value;
+            ajaxRequest("POST", "/espacedoc/delete", checkErrorMessage, "idDoc="+idDoc+"&idMeeting="+idMeeting); //Send the delete request
+            ajaxRequest("GET", "/espacedoc/context", insertContext, "selectedWeek="+selectZoneValue); //Reload the page context
+
+        });
+    });
+}
+
+/**
+ * This function apply an event listener to every create meeting button. On click, it gathers the information of the meeting
+ * stored in a hidden input and then sends them to the database for the processing. Refresh the context of the page immediately after
+ * to apply the changes to the user's page
+ * @returns {void}
+ */
+function activateCreateMeetingButton(){
+    let buttons = Array.from(document.getElementsByClassName("createMeeting"))
+    buttons.forEach((b) => {
+        b.addEventListener("click", () => {
+            let selectZoneValue = document.getElementById("selectWeek").value; //used for the persistence of the selected week
+            let date = b.parentNode.getElementsByTagName("input")[0].value;
+            let timeStart = b.parentNode.getElementsByTagName("input")[1].value;
+            let timeEnd = b.parentNode.getElementsByTagName("input")[2].value;
+            ajaxRequest("POST", "/espacedoc/result", checkErrorMessage, "date="+date+"&timeStart="+timeStart+"&timeEnd="+timeEnd);
+            ajaxRequest("GET", "/espacedoc/context", insertContext, "selectedWeek="+selectZoneValue); //Reload the page context
+        });
+    });
+}
+
 //------------------------------------------------------------------------------
 //--- Insert functions---------------------------------------------------------------
 //------------------------------------------------------------------------------
 // List of functions that treat databases result and insert the correct html
 /**
- * This function inserts in the page every future week in the <select> tag and the days of the selected week in the <table> agenda
- * @param {array} weeks - The JSON array containing the future weeks
- * @param {array} currentWeek - The JSON object reflecting the selected week by the user
+ * This function inserts in the page every future week in the <select> tag and the days of the selected week in the <table> agenda.
+ * @param {array} weeks - The JSON array containing the future weeks.
+ * @param {array} currentWeek - The JSON object reflecting the selected week by the user.
+ * @param {number} selectedWeek - The number corresponding to the selected week's value in the select menu (-1 is the default).
  * @returns {void}
  */
-function insertWeeks(weeks, currentWeek){
+function insertWeeks(weeks, currentWeek, selectedWeek){
     let selectZone = document.getElementById("selectWeek");
     selectZone.innerHTML = "";
     weeks.forEach((w, j) => {
@@ -31,6 +84,37 @@ function insertWeeks(weeks, currentWeek){
         let day = new Date(currentWeek.days[j].date);
         elem.innerHTML = dayArray[j] + " " +day.getDate().toString().padStart(2, '0') + "/" + (day.getMonth()+1).toString().padStart(2, '0');
     });
+
+    //Retrieve the selected week in the menu
+    if(selectedWeek !== -1){
+        selectZone.value = selectedWeek;
+    }
+
+    //Insert the meeting creation space
+    let target = document.getElementById("meetingCreationZone");
+    target.innerHTML = ""; //Empty the zone each time it is reloaded
+    currentWeek.days.forEach((d) => {
+        let day = new Date(d.date);
+        console.log(day);
+        let opt = `
+                <div id="subcontainer">
+                        <div class="form-outline mb-4">
+                            <input type="text" id="form2Example17" value="${dayArray[day.getDay() -1].slice(0,3)+". "+day.getDate().toString().padStart(2, '0')+"/"+((day.getMonth()+1).toString().padStart(2, '0'))+"/"+day.getFullYear()}" class="form-control form-control-sm" name="date" readonly/>
+                        </div>
+        
+                        <div class="form-outline mb-3">
+                            <input type="time" id="timeStart"  name="timeStart" class="form-control form-control-sm" />
+                        </div>
+                        <div class="form-outline mb-4">
+                            <input type="time" id="timeEnd"  name="timeEnd" class="form-control form-control-sm" />
+                        </div>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm createMeeting">Enregistrer</button>
+                    </div>
+        `
+        target.insertAdjacentHTML("beforeend", opt);
+    });
+    activateCreateMeetingButton();
+
 }
 
 /**
@@ -39,23 +123,35 @@ function insertWeeks(weeks, currentWeek){
  * @returns {void}
  */
 function insertContext(data){
-    insertWeeks(data["weekArray"], data["currentWeek"]);
+    insertWeeks(data["weekArray"], data["currentWeek"], data["selectedWeek"]);
     insertMeetings(data["meetings"]);
-    //TODO Continue this function to insert the planning and the inputs to insert timeslots
-    //TODO Change the deleteMeeting to allow a user to only deletes his own meetings (use userId=1&meetingId=62)
 }
 
+/**
+ * This function preload the week selector with the incoming weeks right after the DOM loading time.
+ * @returns {void}
+ */
 function loadWeek(){
     let weekIndex = document.getElementById("selectWeek").value
     ajaxRequest("GET", "/espacedoc/context", insertContext, "selectedWeek="+weekIndex);
 }
 
+/**
+ * This function clears the planning when a new context is loaded. i.e: a new week has been selected
+ * @returns {void}
+ */
 function clearCalendar(){
     Array.from(document.getElementsByTagName("tbody")).forEach((elem) => {
         elem.innerHTML = "";
     });
 }
 
+/**
+ * Load the correct cards and fill them with the information from the meetings array.
+ * Then insert them in the DOM and when finished, activate every button to delete its respective meeting
+ * @param {array} meetings - JSON array containing every meeting of the user
+ * @returns {void}
+ */
 function insertMeetings(meetings){
     clearCalendar();
     meetings.forEach((m, j) => {
@@ -101,7 +197,7 @@ function insertMeetings(meetings){
                                                 <input value=${m.medecin.id}>
                                                 <input value="${m.id}">
                                             </div>
-                                            <button type="button" class="btn btn-danger" data-mdb-ripple-init>Supprimer l'horaire</button>
+                                            <button type="button" class="btn btn-danger delMeetingButton" data-dismiss="modal" data-mdb-ripple-init>Supprimer l'horaire</button>
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
                                         </div>
                                     </div>
@@ -137,7 +233,7 @@ function insertMeetings(meetings){
                                                 <input value=${m.medecin.id}>
                                                 <input value="${m.id}">
                                             </div>
-                                            <button type="button" class="btn btn-danger" data-mdb-ripple-init>Supprimer l'horaire</button>
+                                            <button type="button" class="btn btn-danger delMeetingButton" data-dismiss="modal" data-mdb-ripple-init>Supprimer l'horaire</button>
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
                                         </div>
                                     </div>
@@ -150,6 +246,7 @@ function insertMeetings(meetings){
         let target = document.getElementById("target"+begin.getDay());
         target.insertAdjacentHTML("beforeend", bubble)
     });
+    activateDeleteButton(); //Once all the bubbles have been inserted, activate the delete buttons
 }
 
 //------------------------------------------------------------------------------
@@ -160,4 +257,5 @@ document.addEventListener("DOMContentLoaded", () => {
    ajaxRequest("GET", "/espacedoc/context", insertContext);
    document.getElementById("loadWeek").addEventListener("click", loadWeek);
 });
+//TODO Check why the page doesnt load correctly with the context when refreshed from the menu (aka accessed a second time, afterload)
 

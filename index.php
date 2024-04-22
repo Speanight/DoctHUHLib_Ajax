@@ -34,7 +34,7 @@ if ($method == "GET") {
     elseif ($uri == "/login")               $cntrlLogin->getConnectionForm();
     elseif ($uri == "/rendezvous")          $cntrlApp->getRendezVous();
     elseif($uri == "/espacedoc")            $cntrlApp->getDocPage();
-    elseif($uri == "/espacedoc/context")            $cntrlApp->getDocPlanning();
+    elseif($uri == "/espacedoc/context")    $cntrlApp->getDocPlanning();
     elseif ($uri == "/account")             $cntrlLogin->getAccountEdit();
     elseif ($uri == "/pastmeetings")        $cntrlApp->getPastMeetings();
     elseif ($uri == "/disconnect")          $cntrlLogin->getDisconnect();

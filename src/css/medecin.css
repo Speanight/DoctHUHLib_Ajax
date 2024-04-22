@@ -1,3 +1,9 @@
+#subcontainer {
+    display: flex;
+    flex-direction: row;
+    gap: 2%;
+}
+
 .colorPatient {
     background: #9289AA;
     border-color: #9289AA;
@@ -15,12 +21,6 @@
 .colorFree:hover {
     background: #C6C8EE;
     border-color: #C6C8EE;
-}
-
-#subcontainer {
-    display: flex;
-    flex-direction: row;
-    gap: 2%;
 }
 
 .form-control {

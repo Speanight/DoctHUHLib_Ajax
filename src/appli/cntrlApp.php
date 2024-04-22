@@ -71,9 +71,11 @@ class cntrlApp {
         $weekArray = $DaoTimeslot->getFutureWeeks();
         if(isset($_GET["selectedWeek"]) && $_GET["selectedWeek"] != -1){
             $currentWeek = $weekArray[$_GET["selectedWeek"]];
+            $ajax["selectedWeek"] = $_GET["selectedWeek"]; //persistence of the selected week
         }
         else{
             $currentWeek = $weekArray[0];
+            $ajax["selectedWeek"] = -1;
         }
 
         $meetings = $DaoMeeting->getMeetingsOfDoctor($_SESSION["user"], $currentWeek);
@@ -91,7 +93,13 @@ class cntrlApp {
         $ajax["weekArray"] = $weekArray;
         print_r(json_encode($ajax));
     }
-    public function createMeeting() : string{
+
+    /**
+     * This function gathers the date, beginning and ending of the metting to create, checks different scenarios and ultimatly insert
+     * the meeting in the database if every field is correct
+     * @return void
+     */
+    public function createMeeting() : void{
         $user = $_SESSION['user'];
         $now = new DateTime();
         $now->modify("+1 hour");
@@ -105,29 +113,43 @@ class cntrlApp {
         $DaoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
         $utils = new Utils();
         $date = $_POST["date"];
+        $date = substr($date, 5); //Specific parsing to remove the day prefix because it's specific to the system language allowing
+                                        //the date creation to be independent of the user system
         $ts = $_POST["timeStart"];
         $te = $_POST["timeEnd"];
+
         if(empty($ts) || empty($te)){
-            return $utils->echoWarning("Vous devez spécifier un horaire");
+            $ajax["message"] = $utils->echoWarning("Vous devez spécifier un horaire");
+            print_r(json_encode($ajax));
+            return;
         }
 
-        $beg = DateTime::createFromFormat('D. d/m/Y H:i', $date. " ".$ts);
-        $end = DateTime::createFromFormat('D. d/m/Y H:i', $date. " ".$te);
+        $beg = DateTime::createFromFormat('d/m/Y H:i', $date. " ".$ts);
+        $end = DateTime::createFromFormat('d/m/Y H:i', $date. " ".$te);
         if($beg < $now){
-            return $utils->echoError("Vous ne pouvez créer de rendez-vous antérieur à aujourd'hui");
+            $ajax["message"] = $utils->echoError("Vous ne pouvez créer de rendez-vous antérieur à aujourd'hui");
+            print_r(json_encode($ajax));
+            return;
+
         }
         if($beg >= $end){
-            return $utils->echoError("Cet horaire est incorrect");
+            $ajax["message"] = $utils->echoError("Cet horaire est incorrect");
+            print_r(json_encode($ajax));
+            return;
         }
         if(!$beg || !$end){
-            return $utils->echoError("Erreur lors de la création du rendez-vous");
+            $ajax["message"] = $utils->echoError("Erreur lors de la création du rendez-vous");
+            print_r(json_encode($ajax));
+            return;
         }
         $isSuccess = $DaoMeeting->insertMeeting($beg, $end, $_SESSION["user"]);
         if($isSuccess){
-            return $utils->echoSuccess("Rendez-vous enregistré avec succès");
+            $ajax["message"] = $utils->echoSuccess("Rendez-vous enregistré avec succès");
+            print_r(json_encode($ajax));
         }
         else {
-            return $utils->echoError("Cet horaire existe déjà");
+            $ajax["message"] = $utils->echoError("Cet horaire existe déjà");
+            print_r(json_encode($ajax));
         }
     }
 
@@ -137,14 +159,17 @@ class cntrlApp {
      * @return void
      */
     public function deleteMeeting() : void{
-        $DaoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
+        $utils = new Utils();
         $user = $_SESSION["user"];
         $idDoc = $_POST["idDoc"];
-        $tbeg = $_POST["tbeg"];
-        if($idDoc != $user->get_id()){ //Malveolent user tried to craft a request to delete a non-propretary meeting
+        if($idDoc != $user->get_id()){ //Malicious user tried to craft a request to delete a non-propretary meeting
+            $ajax["message"] = $utils->echoError("Vous n'êtes pas autorisé à faire ceci");
+            print_r(json_encode($ajax));
             return;
         }
-        $DaoMeeting->deleteMeeting($tbeg, $idDoc);
+        $DaoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
+        $idMeeting = $_POST["idMeeting"];
+        $DaoMeeting->deleteMeeting($idMeeting, $idDoc);
     }
 
     /**
