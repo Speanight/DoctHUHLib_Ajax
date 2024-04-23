@@ -15,7 +15,7 @@ class Meeting {
         $this->user         = $user;
     }
 
-    public function meetingToArray(bool $user = true){
+    public function meetingToArray(bool $user = true) : array {
         $meeting = [];
 
         $meeting["id"] = $this->id;

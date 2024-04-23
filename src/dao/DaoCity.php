@@ -67,10 +67,13 @@ class DaoCity
         $statement->bindParam("cityName", $cityName);
         try {
             $statement->execute();
-            return $statement->fetch(PDO::FETCH_ASSOC);
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $err) {
             return -1;
         }
-
+        if(!$result){ //Returned false, the city doesn't exist
+            return -1;
+        }
+        return $result;
     }
 }

@@ -32,4 +32,14 @@ class Week {
     public function setEnd($end) : void {
         $this->end = $end;
     }
+
+    public function weekToArray() : array {
+        $week = [];
+
+        $week["begin"] = $this->begin;
+        $week["end"] = $this->end;
+        $week["days"] = $this->days;
+
+        return $week;
+    }
 }

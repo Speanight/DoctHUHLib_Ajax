@@ -20,7 +20,7 @@ class DaoTime{
             echo $e->getMessage();
         }
     }
-    public function getFutureWeeks(){
+    public function getFutureWeeks() : array{
         $ttime = new DateTime();
         $weekArray = array();
         while($ttime->format("N") != 1){

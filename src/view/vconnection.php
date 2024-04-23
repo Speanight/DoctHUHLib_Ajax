@@ -1,4 +1,5 @@
-<?php echo file_get_contents("src/view/header.html") ?>
+<?php echo file_get_contents("src/view/header.html");
+?>
 <link rel="stylesheet" href="/src/css/connection.css">
 <div class="corpse"> <!-- Content area-->
     <div id="topHeader">
