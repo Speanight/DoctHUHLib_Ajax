@@ -194,7 +194,6 @@ class cntrlApp {
         $daoUser = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
         $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
 
-        // print_r($_GET);
         $idMedecin = $_GET['id'];
 
         $medecin = $daoUser->getFullById($idMedecin);
@@ -307,10 +306,15 @@ class cntrlApp {
 
 
     public function getNextMeeting() {
-        $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
-        $user = $_SESSION['user'];
+        if (isset($_SESSION['user'])) {
+            $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
+            $user = $_SESSION['user'];
 
-        print_r(json_encode($daoMeeting->getNextMeeting($user)));
+            print_r(json_encode($daoMeeting->getNextMeeting($user)));
+        }
+        else {
+            print_r(json_encode(null));
+        }
     }
 
     public function getSpecialities(){

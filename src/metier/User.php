@@ -116,10 +116,10 @@ class User {
         $user["picture"] = $this->picture;
         if (isset($this->place)) $user["place"] = $this->place->placeToArray();
         if (isset($this->speciality)) $user["speciality"] = $this->speciality->specialityToArray();
-        foreach($this->meetings as $m){
-            // print_r($m);
-            print_r(gettype($m[0]));
-            $meetings[] = $m->meetingToArray(false);
+        foreach($this->meetings as $date) {
+            foreach ($date as $meeting) {
+                $meetings[key($date)] = $meeting->meetingToArray(false);
+            }
         }
         $user["meetings"] = $meetings;
 

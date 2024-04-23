@@ -19,20 +19,19 @@ $speArray = $DaoSpeciality->getSpeciality();
                         <div class="d-flex text-black">
                             <div class="flex-shrink-0">
                                 <img src=""
-                                     alt="Generic placeholder image" class="img-fluid"
-                                     style="width: 180px; border-radius: 10px;"
-                                     class="medecin-img">
+                                     alt="Generic placeholder image" class="img-fluid medecin-picture"
+                                     style="width: 180px; border-radius: 10px;">
                             </div>
                             <div class="flex-grow-1 ms-3">
-                                <h5 class="mb-1"><!--=strtoupper($medecin->get_surname())--> <!--=ucfirst($medecin->get_name())--></h5>
-                                <p class="mb-2 pb-1" style="color: #2b2a2a;"><!--=$medecin->get_speciality()->get_type()--></p>
+                                <h5 class="mb-1 medecin-fullname"><!--=strtoupper($medecin->get_surname())--> <!--=ucfirst($medecin->get_name())--></h5>
+                                <p class="mb-2 pb-1 medecin-speciality-type" style="color: #2b2a2a;"><!--=$medecin->get_speciality()->get_type()--></p>
                                 <div class="d-flex justify-content-start rounded-3 p-2 mb-2"
                                      style="background-color: #efefef;">
                                     <div>
                                         <p class="small text-muted mb-1">Adresse</p>
-                                        <p class="mb-0"><!--=$medecin->get_place()->get_name()--></p>
-                                        <p class="mb-0"><!--=$medecin->get_place()->get_num_street()--> <!--=$medecin->get_place()->get_street()--></p>
-                                        <p class="mb-0"><!--=$medecin->get_place()->get_city()->get_code_postal()--> <!--=$medecin->get_place()->get_city()->get_city()--></p>
+                                        <p class="mb-0 medecin-place-name"><!--=$medecin->get_place()->get_name()--></p>
+                                        <p class="mb-0 medecin-place-street"><!--=$medecin->get_place()->get_num_street()--> <!--=$medecin->get_place()->get_street()--></p>
+                                        <p class="mb-0 medecin-place-city"><!--=$medecin->get_place()->get_city()->get_code_postal()--> <!--=$medecin->get_place()->get_city()->get_city()--></p>
                                     </div>
                                 </div>
                             </div>

@@ -27,7 +27,7 @@ function ajaxRequest(type, url, callback, data = null)
     {
       case 200:
       case 201:
-        console.log(xhr.responseText);
+        // console.log(xhr.responseText);
         callback(JSON.parse(xhr.responseText));
         break;
       default:
@@ -82,19 +82,37 @@ function displayPage(data) { //Group header+footer and load the user datas
 }
 
 function displayDatas(data, profile="user") {
-  let user = data["user"];
-  let fullname = document.getElementsByClassName(profile + "-fullname");
-  for (let i = 0; i < fullname.length; i++) {
-    fullname[i].innerHTML = user.surname + " " + user.name;
-  }
+  let user = data[profile];
+  console.log(user);
+  if (user != null) {
+    let fullname = document.getElementsByClassName(profile + "-fullname");
+    for (let i = 0; i < fullname.length; i++) {
+      fullname[i].innerHTML = user.surname + " " + user.name;
+    }
 
-  let photo = document.getElementsByClassName(profile + "-picture");
-  for (let i = 0; i < photo.length; i++) {
-    photo[i].src = "/assets/img/" + user.picture;
-  }
+    let photo = document.getElementsByClassName(profile + "-picture");
+    for (let i = 0; i < photo.length; i++) {
+      photo[i].src = "/assets/img/" + user.picture;
+    }
 
-  for (const key in user) {
-    displayUserData(user, key, profile);
+    let street = document.getElementsByClassName(profile + "-place-street");
+    for (let i = 0; i < street.length; i++) {
+      street[i].innerHTML = user["place"]["num_street"] + " | " + user["place"]["street"]["street"];
+    }
+
+    let city = document.getElementsByClassName(profile + "-place-city");
+    for (let i = 0; i < street.length; i++) {
+      city[i].innerHTML = user["place"]["city"]["code_postal"] + " " + user["place"]["city"]["city"];
+    }
+
+    for (const key in user) {
+      if (key == ("place" || "meetings" || "speciality")) {
+        for (const subKey in user[key]) {
+          displayUserData(user[key], subKey, profile + "-" + key);
+        }
+      }
+      displayUserData(user, key, profile);
+    }
   }
 
   hideElementUser(user);
@@ -111,7 +129,9 @@ function displayNextMeeting(data) {
 
 function displayMedecinMeetings(data) {
   displayPage(data);
-  displayDatas(data, "medecin");
+  document.addEventListener("DOMContentLoaded", function() {
+    displayDatas(data, "medecin");
+  })
 }
 
 /**
@@ -127,14 +147,14 @@ We can call the function with displayUserData(user, "name");
 This will cause the function to display the name in every HTML element that has
 "user-name" in its class.
 */
-function displayUserData(user, data, user) {
-  let elements = document.getElementsByClassName(user + data);
+function displayUserData(user, data, name) {
+  let elements = document.getElementsByClassName(name + "-" + data);
   for (let i = 0; i < elements.length; i++) {
     if (elements[i].nodeName === "INPUT") {
       elements[i].value = user[data];
     }
     else {
-      elements[i].value = user[data];
+      elements[i].innerHTML = user[data];
     }
   }
 }
@@ -234,8 +254,8 @@ function loadMedecinPage(data){
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-  ajaxRequest("GET", "/user", displayDatas);
   ajaxRequest("GET", "/meeting/next", displayNextMeeting);
+  ajaxRequest("GET", "/user", displayDatas);
 })
 
 //Avoid recursive load of ajax.js hence an epileptic loading page
