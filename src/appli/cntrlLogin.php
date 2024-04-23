@@ -8,26 +8,25 @@ class  cntrlLogin {
     Contrôleur possédant toutes les pages en lien avec l'enregistrement et
     la connexion.
     */
-    public function getConnectionForm() {
+    public function getConnectionForm() : void {
         if(session_status() !== PHP_SESSION_ACTIVE){
             session_start();
         }
         if (isset($_SESSION['user'])) {
             $utils = new Utils();
-            $utils->echoInfo("Vous êtes déjà connecté ! Redirection sur l'accueil");
-            require PATH_VIEW . "vaccueil.php";
+            echo $utils->echoInfo("Vous êtes déjà connecté ! Redirection sur l'accueil");
+            //relocate to accueil
         }
         else {
             require PATH_VIEW . "vconnection.php";
         }
     }
 
-    public function getDocConnectionForm(){
-
+    public function getDocConnectionForm() : void{
         require PATH_VIEW . "vmconnection.php";
     }
 
-    public function getLoginResult() {
+    public function getLoginResult() :void {
         $utils = new Utils();
         $mail       = $_POST['mail'];
         $password   = $_POST['password'];
@@ -36,21 +35,18 @@ class  cntrlLogin {
 
         if ($id == NULL) {
             $needle = "L'adresse email ou le mot de passe renseigné est incorrect";
-            $utils->echoError($needle);
+            echo $utils->echoError($needle);
             require PATH_VIEW . "vconnection.php";
 
         }
         else {
             $utils->constructSession($id);
-            $needle = "Vous êtes connecté";
-            $utils->echoSuccess($needle);
-
-            $cntrlApp = new CntrlApp();
-            $cntrlApp->getAccueil();
+            header("Location: ". 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}"); //Sanitize the HTTP_ value in sg $_SERVER
+            //echo $utils->echoSuccess("Vous êtes connecté"); Not working because the header have been relocated
         }
     }
 
-    public function getRegisterResult() {
+    public function getRegisterResult() : void {
         $DaoUser = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
         $name = $surname = $phone = $mail = $mailVerify = $password = $passwordVerify = "";
         $utils = new Utils();
@@ -66,27 +62,27 @@ class  cntrlLogin {
 
         $phone = str_replace(' ', '', $phone);
         if($utils->hasLetters($phone)){
-            $utils->echoWarning("Un numéro de téléphone ne peut contenir de lettres");
+            echo $utils->echoWarning("Un numéro de téléphone ne peut contenir de lettres");
             require PATH_VIEW . "vconnection.php";
             return;
         }
         if(strlen($phone) != 10){
-            $utils->echoWarning("Veuillez saisir un numéro de téléphone français");
+            echo $utils->echoWarning("Veuillez saisir un numéro de téléphone français");
             require PATH_VIEW . "vconnection.php";
             return;
         }
         if(!$utils->isSanitize($name) || !$utils->isSanitize($surname)){
-            $utils->echoWarning("Le nom et prénom ne peuvent contenir ni caractères spéciaux ni accents");
+            echo $utils->echoWarning("Le nom et prénom ne peuvent contenir ni caractères spéciaux ni accents");
             require PATH_VIEW . "vconnection.php";
             return;
         }
         if($mail !== $mailVerify){
-            $utils->echoWarning("La deuxième adresse mail ne correspond pas à la première");
+            echo $utils->echoWarning("La deuxième adresse mail ne correspond pas à la première");
             require PATH_VIEW . "vconnection.php";
             return;
         }
         if($password !== $passwordVerify){
-            $utils->echoWarning("Le deuxième mot de passe ne correspond pas au premier");
+            echo $utils->echoWarning("Le deuxième mot de passe ne correspond pas au premier");
             require PATH_VIEW . "vconnection.php";
             return;
         }
@@ -99,12 +95,13 @@ class  cntrlLogin {
         if(empty($errString)){ //No errors, account created, start session and redirect on rendez-vous page
             $id = $DaoUser->connectUser($mail, $password);
             $utils->constructSession($id);
-            $utils->echoSuccess("Votre compte a bien été créé.");
+            echo $utils->echoSuccess("Votre compte a bien été créé.");
             $utils->clearAlert();
-            require PATH_VIEW . "vrendezvous.php";
+            header("Location: ". 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}"); //Sanitize the HTTP_ value in sg $_SERVER
+
         }
         else{ //error, appen error message and reload the page
-            $utils->echoError($errString);
+            echo $utils->echoError($errString);
             $utils->clearAlert();
             require  PATH_VIEW . "vconnection.php";
 
@@ -141,7 +138,7 @@ class  cntrlLogin {
         // require_once PATH_VIEW . "vaccount.php";
     }
 
-    public function getAccountEditResult() {
+    public function getAccountEditResult() : void {
         $phone = $_POST['phone'];
         $phone = str_replace(' ', '', $phone);
         $newPass = $_POST['pass'];
@@ -154,17 +151,17 @@ class  cntrlLogin {
         $daoUser    = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
 
         if($utils->hasLetters($phone)){
-            $utils->echoWarning("Un numéro de téléphone ne peut contenir de lettres");
+            echo $utils->echoWarning("Un numéro de téléphone ne peut contenir de lettres");
             $this->getAccountEdit();
             return;
         }
         if(strlen($phone) != 10){
-            $utils->echoInfo("Veuillez saisir un numéro de téléphone français");
+            echo $utils->echoInfo("Veuillez saisir un numéro de téléphone français");
             $this->getAccountEdit();
             return;
         }
         if ($newPass != $newPassConf) {
-            $utils->echoError("Les nouveaux mots de passe ne correspondent pas");
+            echo $utils->echoError("Les nouveaux mots de passe ne correspondent pas");
         }
         else {
             $photo = null;
@@ -173,20 +170,13 @@ class  cntrlLogin {
             $result = $daoUser->getEditUser($user, $email, $phone, $photo, $oldPass, $newPass);
         }
         if ($result == null) {
-            $utils->echoError("Votre ancien mot de passe est incorrect");
+            echo $utils->echoError("Votre ancien mot de passe est incorrect");
         }
-        $utils->echoSuccess("Vos informations ont été mises à jour");
+        echo $utils->echoSuccess("Vos informations ont été mises à jour");
         $this->getAccountEdit();
     }
 
-    public function getDisconnect() {
-        $cntrlApp = new cntrlApp();
-        $utils = new Utils();
-        $utils->destructSession();
-
-        $this->getConnectionForm();
-    }
-    public function getRegisterDocResult() {
+    public function getRegisterDocResult() : void {
         $DaoUser = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
         $DaoCity = new DaoCity(DBHOST, DBNAME, PORT, USER, PASS);
         $cntrlApp = new cntrlApp();
@@ -211,42 +201,53 @@ class  cntrlLogin {
         $codeInseeResult = $DaoCity->getCodeInsee($city);
         $codeInsee = $codeInseeResult["code_insee"];
 
+        if(empty($password)){
+            echo $utils->echoWarning("Veuillez saisir un mot de passe"),
+            require PATH_VIEW . "vmconnection.php";
+            return;
+        }
+        if(empty($mail)){
+            echo $utils->echoWarning("Veuillez saisir un email"),
+            require PATH_VIEW . "vmconnection.php";
+            return;
+        }
         if($codeInsee == -1){
-            $utils->echoWarning("Cette ville n'existe pas");
+            echo $utils->echoWarning("Cette ville n'existe pas");
             require PATH_VIEW . "vmconnection.php";
             return;
         }
         $phone = str_replace(' ', '', $phone);
         if($utils->hasLetters($phone)){
-            $utils->echoWarning("Un numéro de téléphone ne peut contenir de lettres");
+            echo $utils->echoWarning("Un numéro de téléphone ne peut contenir de lettres");
             require PATH_VIEW . "vmconnection.php";
         }
         if(strlen($phone) != 10){
-            $utils->echoWarning("Veuillez saisir un numéro de téléphone français");
+            echo $utils->echoWarning("Veuillez saisir un numéro de téléphone français");
             require PATH_VIEW . "vmconnection.php";
             return;
         }
         if(!$utils->isSanitize($name) || !$utils->isSanitize($surname)){
-            $utils->echoWarning("Le nom et prénom ne peuvent contenir ni caractères spéciaux ni accents");
+            echo $utils->echoWarning("Le nom et prénom ne peuvent contenir ni caractères spéciaux ni accents");
             require PATH_VIEW . "vmconnection.php";
             return;
         }
         if(!$utils->isSanitize($street)){
-            $utils->echoWarning("Le nom de rue ne peut contenir de caractères spéciaux");
+            echo $utils->echoWarning("Le nom de rue ne peut contenir de caractères spéciaux");
             require PATH_VIEW . "vmconnection.php";
             return;
         }
         if(!$utils->isSanitize($namePlace)){
-            $utils->echoWarning("Le nom d'établissement ne peut contenir de caractères spéciaux");
+            echo $utils->echoWarning("Le nom d'établissement ne peut contenir de caractères spéciaux");
             require PATH_VIEW . "vmconnection.php";
             return;
         }
 
         if($password !== $passwordVerify){
-            $utils->echoWarning("Le deuxième mot de passe ne correspond pas au premier");
+            echo $utils->echoWarning("Le deuxième mot de passe ne correspond pas au premier");
             require PATH_VIEW . "vmconnection.php";
             return;
         }
+
         else{
             $daoUser = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
             $hashedPass = password_hash($password, PASSWORD_BCRYPT);
@@ -256,19 +257,16 @@ class  cntrlLogin {
         if(empty($errString)){ //No errors, account created, start session and redirect on rendez-vous page
             $id = $DaoUser->connectUser($mail, $password);
             $utils->constructSession($id);
-            $cntrlApp->getDocPage();
-            $utils->echoSuccess("Votre compte a bien été créé.");
-            $utils->clearAlert();
+            header("Location: ". 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}"); //Sanitize the HTTP_ value in sg $_SERVER and relocate to the root document
         }
         else{ //error, appen error message and reload the page
-            $utils->echoError($errString);
+            echo $utils->echoError($errString);
             $utils->clearAlert();
             require  PATH_VIEW . "vmconnection.php";
-            return;
         }
     }
 
-    public function getUser() {
+    public function getUser() : ?array {
         $ajax   = [];
         $daoUser        = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
         $daoSpeciality  = new DaoSpeciality(DBHOST, DBNAME, PORT, USER, PASS);

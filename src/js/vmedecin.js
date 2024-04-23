@@ -1,18 +1,30 @@
+
+//------------------------------------------------------------------------------
+//--- onLoad block function---------------------------------------------------------------
+//------------------------------------------------------------------------------
+// List of functions that loads immediatly after the DOM is generated
+console.log("vmedinjs loaded");
+ajaxRequest("GET", "/espacedoc/context", insertContext);
+document.getElementById("loadWeek").addEventListener("click", loadWeek);
+
+
 /**
  * An array used to convert the position of the day in a week to its prefix.
  * As the getDay() method starts from Sunday (Sunday => 0), a negative index is implemented to correct the starting number and allow
  * a more casual display form Monday to Sunday.
  * @type {any[]}
  */
-let dayArray = Array(7);
-dayArray[-1] = "Dimanche"
-dayArray[0] = "Lundi"
-dayArray[1] = "Mardi"
-dayArray[2] = "Mercredi"
-dayArray[3] = "Jeudi"
-dayArray[4] = "Vendredi"
-dayArray[5] = "Samedi"
-dayArray[6] = "Dimanche"
+if (!window.dayArray) { //Stored in the global variable window because it is reloaded mutliple time causing a redifinition error otherwise
+    window.dayArray = Array(7);
+    window.dayArray[-1] = "Dimanche";
+    window.dayArray[0] = "Lundi";
+    window.dayArray[1] = "Mardi";
+    window.dayArray[2] = "Mercredi";
+    window.dayArray[3] = "Jeudi";
+    window.dayArray[4] = "Vendredi";
+    window.dayArray[5] = "Samedi";
+    window.dayArray[6] = "Dimanche";
+}
 
 //------------------------------------------------------------------------------
 //--- eventListener functions---------------------------------------------------------------
@@ -75,14 +87,14 @@ function insertWeeks(weeks, currentWeek, selectedWeek){
     weeks.forEach((w, j) => {
         let begin = new Date(w.begin.date)
         let end = new Date(w.end.date)
-        let week = `<option value="${j}">${dayArray[begin.getDay()-1].slice(0,3)+". "+begin.getDate().toString().padStart(2, '0')+"/"+((begin.getMonth()+1).toString().padStart(2, '0'))+"/"+begin.getFullYear()  + " - "  +  dayArray[end.getDay()].slice(0,3)+". "+end.getDate().toString().padStart(2, '0')+"/"+(end.getMonth()+1).toString().padStart(2, '0')+"/"+end.getFullYear()}</option>`
+        let week = `<option value="${j}">${window.dayArray[begin.getDay()-1].slice(0,3)+". "+begin.getDate().toString().padStart(2, '0')+"/"+((begin.getMonth()+1).toString().padStart(2, '0'))+"/"+begin.getFullYear()  + " - "  +  window.dayArray[end.getDay()].slice(0,3)+". "+end.getDate().toString().padStart(2, '0')+"/"+(end.getMonth()+1).toString().padStart(2, '0')+"/"+end.getFullYear()}</option>`
         selectZone.insertAdjacentHTML("beforeend", week);
     });
 
     //insert the day and the date for each <th> of the tables
     Array.from(document.getElementsByTagName("th")).forEach((elem, j) => {
         let day = new Date(currentWeek.days[j].date);
-        elem.innerHTML = dayArray[j] + " " +day.getDate().toString().padStart(2, '0') + "/" + (day.getMonth()+1).toString().padStart(2, '0');
+        elem.innerHTML = window.dayArray[j] + " " +day.getDate().toString().padStart(2, '0') + "/" + (day.getMonth()+1).toString().padStart(2, '0');
     });
 
     //Retrieve the selected week in the menu
@@ -99,7 +111,7 @@ function insertWeeks(weeks, currentWeek, selectedWeek){
         let opt = `
                 <div id="subcontainer">
                         <div class="form-outline mb-4">
-                            <input type="text" id="form2Example17" value="${dayArray[day.getDay() -1].slice(0,3)+". "+day.getDate().toString().padStart(2, '0')+"/"+((day.getMonth()+1).toString().padStart(2, '0'))+"/"+day.getFullYear()}" class="form-control form-control-sm" name="date" readonly/>
+                            <input type="text" id="form2Example17" value="${window.dayArray[day.getDay() -1].slice(0,3)+". "+day.getDate().toString().padStart(2, '0')+"/"+((day.getMonth()+1).toString().padStart(2, '0'))+"/"+day.getFullYear()}" class="form-control form-control-sm" name="date" readonly/>
                         </div>
         
                         <div class="form-outline mb-3">
@@ -248,14 +260,4 @@ function insertMeetings(meetings){
     });
     activateDeleteButton(); //Once all the bubbles have been inserted, activate the delete buttons
 }
-
-//------------------------------------------------------------------------------
-//--- onLoad block function---------------------------------------------------------------
-//------------------------------------------------------------------------------
-// List of functions that loads immediatly after the DOM is generated
-document.addEventListener("DOMContentLoaded", () => {
-   ajaxRequest("GET", "/espacedoc/context", insertContext);
-   document.getElementById("loadWeek").addEventListener("click", loadWeek);
-});
-//TODO Check why the page doesnt load correctly with the context when refreshed from the menu (aka accessed a second time, afterload)
 

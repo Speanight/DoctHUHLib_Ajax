@@ -10,11 +10,15 @@ function insertSpecialities(data){
 //TODO Hide the HTML table when no doctor is found
 function insertDoctors(data){
     document.getElementById("cardZone").innerHTML = ""; //Empty the card for each new request
-    if(checkErrorMessage(data)) return;
-
-    data.forEach((elem) => {
-        printDoctors(elem.name, elem.surname, elem.picture, elem.speciality.type, elem.phone, elem.mail, elem.place.name, elem.place.num_street, elem.place.street, elem.place.city.code_postal, elem.place.city.city )
-    });
+    if(checkErrorMessage(data)){
+        document.getElementById("baseTable").classList.add("d-none"); //Hide the base table when no doctor is found
+    }
+    else {
+        document.getElementById("baseTable").classList.remove("d-none"); //Show the table where the doctor's card will be inserted
+        data.forEach((elem) => {
+            printDoctors(elem.name, elem.surname, elem.picture, elem.speciality.type, elem.phone, elem.mail, elem.place.name, elem.place.num_street, elem.place.street, elem.place.city.code_postal, elem.place.city.city)
+        });
+    }
 }
 
 function printDoctors(name, surname, picture, speciality, phone, mail, facilityName, streetNumber, street, postalCode, cityName){

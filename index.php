@@ -37,7 +37,6 @@ if ($method == "GET") {
     elseif($uri == "/espacedoc/context")    $cntrlApp->getDocPlanning();
     elseif ($uri == "/account")             $cntrlLogin->getAccountEdit();
     elseif ($uri == "/pastmeetings")        $cntrlApp->getPastMeetings();
-    elseif ($uri == "/disconnect")          $cntrlLogin->getDisconnect();
     elseif($uri == "/debug")                $utils->constructSession(12);
     elseif($uri == "/espacedoc/creation")   $cntrlLogin->getDocConnectionForm();
     elseif ($uri == "/user")                $cntrlLogin->getUser();
@@ -45,18 +44,18 @@ if ($method == "GET") {
     elseif ($uri == "/meeting/next")        $cntrlApp->getNextMeeting();
     elseif ($uri == "/specialities")        $cntrlApp->getSpecialities();
     elseif ($uri == "/rendezvous/result")   $cntrlApp->getMedecin();
-    else $cntrlLogin->getConnectionForm();
+    else             header("Location: ". 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}"); //Sanitize the HTTP_ value in sg $_SERVER and relocate to the root document
 }
 elseif ($method == "POST") {
     if ($uri == "/login/result")                            $cntrlLogin->getLoginResult();
     elseif ($uri == "/register/result")                     $cntrlLogin->getRegisterResult();
+    elseif($uri == '/espacedoc/creation/result')            $cntrlLogin->getRegisterDocResult();
     elseif ($uri === "/disconnect")                         $utils->destructSession();
     elseif ($uri == "/rendezvous/medecin/disponibilites")   $cntrlApp->dispoMedecin();
     elseif ($uri == "/rendezvous/medecin/result")           $cntrlApp->userReservation();
     elseif ($uri == '/rendezvous/cancel')                   $cntrlApp->getCancelMeeting();
     elseif($uri == '/espacedoc/result')                     $cntrlApp->createMeeting();
-    elseif($uri == '/espacedoc/creation/result')            $cntrlLogin->getRegisterDocResult();
     elseif($uri == '/espacedoc/delete')                     $cntrlApp->deleteMeeting();
     elseif($uri == '/account/result')                       $cntrlLogin->getAccountEditResult();
-    else $cntrlLogin->getConnectionForm();
+    else             header("Location: ". 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}"); //Sanitize the HTTP_ value in sg $_SERVER and relocate to the root document
 }

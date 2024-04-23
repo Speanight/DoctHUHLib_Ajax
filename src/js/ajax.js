@@ -25,6 +25,8 @@ function ajaxRequest(type, url, callback, data = null)
     url += '?' + data;
   xhr.open(type, url);
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.setRequestHeader('Cache-Control', 'no-cache');
+  xhr.setRequestHeader('Pragma', 'no-cache');
 
   // Add the onload function.
   xhr.onload = () =>
@@ -221,10 +223,24 @@ function checkErrorMessage(data){
   return 'message' in data;
 }
 
+function isUserConnected(user){
+    if(user["user"] == null){
+      window.location.href = document.location.origin+"/login"; //http:\//localhost/login
+    }
+    else{
+        ajaxRequest("GET", "/rendezvous", loadSantePage);
+    }
+}
+
 //------------------------------------------------------------------------------
 //--- Loading page block ---------------------------------------------------------------
 //------------------------------------------------------------------------------
 // List of functions that loads the corresponding page
+function onceDisconnected(data){
+  ajaxRequest("GET", "/accueil", loadAccueil);
+  checkErrorMessage(data);
+}
+
 /**
  * Load the html and header from the health search space into the current page
  * @param data
@@ -250,6 +266,7 @@ function loadMedecinPage(data){
   hideElementUser(data)
 }
 
+//Carefull, as this is a "vaccueil" related function, it should be in a separate js file. This function is currently executed when the right context is not present, thus creating an error
 document.addEventListener("DOMContentLoaded", function() {
   ajaxRequest("GET", "/user", displayDatas);
   ajaxRequest("GET", "/meeting/next", displayNextMeeting);
@@ -261,9 +278,9 @@ if (document.getElementById("initialLoad") !== null) {
 }
 
 //------------------------------------------------------------------------------
-//--- Page event redirection block ---------------------------------------------------------------
+//--- Page event block ---------------------------------------------------------------
 //------------------------------------------------------------------------------
-// Call the correct function to load the clicked page
+// A list of event listeners that needs to be reloaded each refresh or page redirection
 document.getElementById("acButton").addEventListener("click", () => {
     ajaxRequest("GET", "/accueil", loadAccueil);
 });
@@ -272,9 +289,12 @@ document.getElementById("titleButton").addEventListener("click", () => {
 });
 document.getElementById("esButton").addEventListener("click", () => {
   //TODO Check if user is connected. If not, redirect directly to the vconnectioN.php page to execute the php code. If connected, launch the request below
-  ajaxRequest("GET", "/rendezvous", loadSantePage);
+  ajaxRequest("GET", "/user", isUserConnected);
 });
 document.getElementById("epButton").addEventListener("click", () => {
     ajaxRequest("GET", "/espacedoc", loadMedecinPage);
 });
+document.getElementById("disconnect").addEventListener("click", () => {
+    ajaxRequest("POST", "/disconnect", onceDisconnected);
+})
 
