@@ -35,7 +35,7 @@ function ajaxRequest(type, url, callback, data = null)
     {
       case 200:
       case 201:
-        // console.log(xhr.responseText);
+        console.log(xhr.responseText);
         callback(JSON.parse(xhr.responseText));
         break;
       default:
@@ -139,6 +139,7 @@ function displayMedecinMeetings(data) {
   displayPage(data);
   document.addEventListener("DOMContentLoaded", function() {
     displayDatas(data, "medecin");
+    displayMeetingsToUser(data);
   })
 }
 
@@ -224,6 +225,7 @@ function hideElementUser(user) {
  * @returns {string}
  */
 function capitalizeFirstLetter(str) {
+  // TODO: Voir pourquoi erreur sur string.charAt qui n'est pas une fonction.
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
@@ -299,6 +301,73 @@ document.addEventListener("DOMContentLoaded", function() {
 if (document.getElementById("initialLoad") !== null) {
   ajaxRequest("GET", "/accueil", loadAccueil);
 }
+
+//------------------------------------------------------------------------------
+//--- Functions for getting a meeting ---------------------------------------------------------------
+//------------------------------------------------------------------------------
+function displayMeetingsToUser(data) {
+  // console.log(data["medecin"]["meetings"]);
+  let meetings = data["medecin"]["meetings"];
+  for (const day in meetings) {
+    let today = new Date();
+    let meetingDay = new Date(day);
+
+    if (meetingDay > today) {
+      printMeetingInList(day, meetings[day]);
+      for (const meeting in day) {
+        let today = new Date();
+
+        // console.log(day);
+        // console.log(meeting);
+        // console.log(meetings[key]);
+        // console.log("|-----|");
+      }
+    }
+  }
+}
+
+function printMeetingInList(day, meetings) {
+  let elementArea = document.getElementById("meetings-area");
+  console.log(meetings);
+  let planning = `<h1>${day}</h1>
+  <table class="table">
+    <thead>
+    <tr>
+      <th scope="col">Début</th>
+      <th scope="col">Fin</th>
+      <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>`
+
+  for(const meeting of meetings) {
+    // TODO: Rendre boutons utilisables et fixer dates
+    console.log(meeting.beginning);
+    console.log(meeting.beginning.date);
+    const beginning = meeting.beginning.date.split(" ")[1].substring(0, 5);
+    const ending = meeting.ending.date.split(" ")[1].substring(0, 5);
+    planning += `
+    <tr>
+      <td>${beginning}</td>
+      <td>${ending}</td>
+      <td>
+    `
+    if (meeting.user == null) {
+      planning += `
+      <input type="text" name="idMeeting" value="${meeting.id}" hidden />
+      <button class="btn btn-primary reserve-meeting">Réserver</button>`
+    }
+    else {
+      planning += `
+      <button class="btn btn-danger">Occupé</button>
+      `
+    }
+  }
+  planning += `</td>`
+
+  elementArea.innerHTML += planning;
+}
+
 
 //------------------------------------------------------------------------------
 //--- Page event block ---------------------------------------------------------------

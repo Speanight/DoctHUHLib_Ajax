@@ -19,11 +19,12 @@ class Meeting {
         $meeting = [];
 
         $meeting["id"] = $this->id;
-        $meeting["beginning"] = $this->beginning->format("Y-m-d H:i:s");
-        $meeting["ending"] = $this->ending->format("Y-m-d H:i:s");;
+        $meeting["beginning"] = $this->beginning;
+        $meeting["ending"] = $this->ending;
         $meeting["place"] = $this->place;
         $meeting["medecin"] = $this->medecin;
-        if ($user) $meeting["user"] = $this->user->userToArray();
+        if ($this->user == null) $meeting["user"] = null;
+        else $meeting["user"] = $this->user->userToArray();
 
         return $meeting;
     }

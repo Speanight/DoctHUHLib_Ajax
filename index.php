@@ -44,6 +44,7 @@ if ($method == "GET") {
     elseif ($uri == "/meeting/next")        $cntrlApp->getNextMeeting();
     elseif ($uri == "/specialities")        $cntrlApp->getSpecialities();
     elseif ($uri == "/rendezvous/result")   $cntrlApp->getMedecin();
+    elseif ($uri == "/rendezvous/medecin/disponibilites")   $cntrlApp->dispoMedecin();
     else             header("Location: ". 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}"); //Sanitize the HTTP_ value in sg $_SERVER and relocate to the root document
 }
 elseif ($method == "POST") {

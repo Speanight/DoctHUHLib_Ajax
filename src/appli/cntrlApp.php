@@ -262,7 +262,7 @@ class cntrlApp {
 
         foreach ($meetings as $meeting) {
             if ($meeting->get_beginning() > $today) {
-                $day = $meeting->get_beginning()->format('D d/m Y');
+                $day = $meeting->get_beginning()->format('Y-m-d');
                 if (!isset($orderedMeetings[$day])) $orderedMeetings[$day] = [];
                 array_push($orderedMeetings[$day], $meeting);
             }

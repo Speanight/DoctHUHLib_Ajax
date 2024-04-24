@@ -16,7 +16,7 @@ function insertDoctors(data){
     else {
         document.getElementById("baseTable").classList.remove("d-none"); //Show the table where the doctor's card will be inserted
         data.forEach((elem) => {
-            printDoctors(elem.name, elem.surname, elem.picture, elem.speciality.type, elem.phone, elem.mail, elem.place.name, elem.place.num_street, elem.place.street, elem.place.city.code_postal, elem.place.city.city)
+            printDoctors(elem.id, elem.name, elem.surname, elem.picture, elem.speciality.type, elem.phone, elem.mail, elem.place.name, elem.place.num_street, elem.place.street, elem.place.city.code_postal, elem.place.city.city)
         });
     }
 

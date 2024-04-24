@@ -106,7 +106,7 @@ class User {
 
     public function userToArray() : array {
         $user = [];
-        $meetings = [];
+        $allMeetings = [];
 
         $user["id"] = $this->id;
         $user["name"] = ucfirst($this->name);
@@ -116,12 +116,15 @@ class User {
         $user["picture"] = $this->picture;
         if (isset($this->place)) $user["place"] = $this->place->placeToArray();
         if (isset($this->speciality)) $user["speciality"] = $this->speciality->specialityToArray();
-        foreach($this->meetings as $date) {
-            foreach ($date as $meeting) {
-                $meetings[key($date)] = $meeting->meetingToArray(false);
+        // print_r($this->meetings);
+        foreach($this->meetings as $day => $meetings) {
+            foreach ($meetings as $meeting) {
+                // $allMeetings[key($date)] = $meeting->get_id();
+                if (!isset($allMeetings[$day])) $allMeetings[$day] = [];
+                array_push($allMeetings[$day], $meeting->meetingToArray(false));
             }
         }
-        $user["meetings"] = $meetings;
+        $user["meetings"] = $allMeetings;
 
         return $user;
     }
