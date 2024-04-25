@@ -22,7 +22,7 @@ class Meeting {
         $meeting["beginning"] = $this->beginning;
         $meeting["ending"] = $this->ending;
         $meeting["place"] = $this->place;
-        $meeting["medecin"] = $this->medecin;
+        $meeting["medecin"] = $this->medecin->userToArray(false);
         if ($this->user == null) $meeting["user"] = null;
         else $meeting["user"] = $this->user->userToArray();
 

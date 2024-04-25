@@ -268,11 +268,111 @@ function onceDisconnected(data){
 
 /**
  * Load the html and header from the health search space into the current page
+ * - Uses the function showMeetingsIntable() to display the meetings below.
  * @param data
  */
 function loadSantePage(data){
   displayPage(data)
-  // hideElementUser(data)
+  document.addEventListener("DOMContentLoaded", () => {
+    if ("futureMeetings" in data) {
+      let area = document.getElementById("futureMeetings");
+      let content = `
+      <h3>Vos prochains rendez-vous</h3>
+      <hr>
+      `
+      content += showMeetingsInTable(data["futureMeetings"]);
+      console.log(content);
+      area.innerHTML += content;
+    }
+
+    if ("pastMeetings" in data) {
+      let area2 = document.getElementById("pastMeetings");
+      let content2 = `
+      <h3>Vos rendez-vous passés</h3>
+      <hr>
+      `
+      content2 += showMeetingsInTable(data["pastMeetings"]);
+      area2.innerHTML += content2;
+    }
+
+    let buttons = document.getElementsByClassName("btn-rdv-medecin");
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", () => {
+            ajaxRequest("GET", "/rendezvous/medecin/disponibilites", displayMedecinMeetings, "id=" + buttons[i].previousElementSibling.value);
+        })
+    }
+
+    let buttons_cancel = document.getElementsByClassName("btn-rdv-cancel");
+    for (let i = 0; i < buttons_cancel.length; i++) {
+      buttons_cancel[i].addEventListener("click", () => {
+        ajaxRequest("GET", "/rendezvous/cancel", checkErrorMessage, "id=" + buttons_cancel[i].previousElementSibling.value);
+        document.getElementById("tableRow-" + buttons_cancel[i].previousElementSibling.value).remove();
+      })
+    }
+  });
+}
+
+/**
+ * Collects an array of meetings and returns them in the form of an array. Mainly used
+ * for the page "Espace santé" if there is any meeting that meets the requirements.
+ * - The function will automatically add (or not) the cancel button depending of the date.
+ * @param {array} meetings 
+ * @returns string - contains a table with all the arrays.
+ */
+function showMeetingsInTable(meetings) {
+  let content = `
+  <table class="table">
+  <thead>
+  <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Plage horaire</th>
+      <th scope="col">Médecin</th>
+      <th scope="col">Spécialité</th>
+      <th scope="col" class="text-center">Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  `
+
+  let today = new Date();
+  let tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+
+  for (let i = 0; i < meetings.length; i++) {
+    let date = new Date(meetings[i].beginning.date);
+    content += `
+    <tr id="tableRow-${meetings[i].id}">
+        <td>${meetings[i].beginning.date.split(" ")[0]}</td>
+        <td>${meetings[i].beginning.date.split(" ")[1].split(".")[0]} - ${meetings[i].ending.date.split(" ")[1].split(".")[0]}</td>
+        <td>${meetings[i].medecin.surname} ${meetings[i].medecin.name}</td>
+        <td>${meetings[i].medecin.speciality.type}</td>
+        <td class="d-flex flex-row justify-content-around">
+            <input type="text" name="idMedecin" value="${meetings[i].medecin.id}" hidden />
+            <button type="submit" class="btn btn-info btn-rdv-medecin">Réserver un autre RDV</button>
+    `
+    if (date >= tomorrow) {
+      content += `
+        <input type="text" name="idMeeting" value="${meetings[i].id}" hidden>
+        <button type="submit" class="btn btn-danger btn-rdv-cancel">Annuler</button>
+      `
+    }
+    else if (date >= today) {
+      content += `
+        <button type="submit" class="btn btn-danger" title="Vous ne pouvez annuler un rendez-vous que 24h en avance" disabled>Annuler</button>
+      `
+    }
+
+    content += `
+        </td>
+      </tr>
+    `
+  }
+
+  content += `
+      </tbody>
+    </table>
+  `
+
+  return content;
 }
 
 /**
@@ -306,7 +406,6 @@ if (document.getElementById("initialLoad") !== null) {
 //--- Functions for getting a meeting ---------------------------------------------------------------
 //------------------------------------------------------------------------------
 function displayMeetingsToUser(data) {
-  // console.log(data["medecin"]["meetings"]);
   let meetings = data["medecin"]["meetings"];
   for (const day in meetings) {
     let today = new Date();
@@ -314,21 +413,32 @@ function displayMeetingsToUser(data) {
 
     if (meetingDay > today) {
       printMeetingInList(day, meetings[day]);
-      for (const meeting in day) {
-        let today = new Date();
-
-        // console.log(day);
-        // console.log(meeting);
-        // console.log(meetings[key]);
-        // console.log("|-----|");
-      }
     }
+  }
+
+  // Make the buttons word and book a meeting.
+  let buttons = document.getElementsByClassName("reserve-meeting");
+  for (let i = 0; i < buttons.length; i++) {
+    // TODO: Fix - réserver un RDV au dessus décale tout ceux du dessous après.
+    buttons[i].addEventListener("click", () => {
+      ajaxRequest("POST", "/rendezvous/medecin/reserver", reserveMeetingResult, "id=" + buttons[i].previousElementSibling.value);
+      
+    })
+    
+  }
+}
+
+function reserveMeetingResult(data) {
+  checkErrorMessage(data);
+  if ("success" in data) {
+    let button = document.getElementById("reserve-button-" + data["success"])
+    button.classList = "btn btn-warning";
+    button.innerHTML = "Votre horaire";
   }
 }
 
 function printMeetingInList(day, meetings) {
   let elementArea = document.getElementById("meetings-area");
-  console.log(meetings);
   let planning = `<h1>${day}</h1>
   <table class="table">
     <thead>
@@ -341,9 +451,6 @@ function printMeetingInList(day, meetings) {
     <tbody>`
 
   for(const meeting of meetings) {
-    // TODO: Rendre boutons utilisables et fixer dates
-    console.log(meeting.beginning);
-    console.log(meeting.beginning.date);
     const beginning = meeting.beginning.date.split(" ")[1].substring(0, 5);
     const ending = meeting.ending.date.split(" ")[1].substring(0, 5);
     planning += `
@@ -355,11 +462,11 @@ function printMeetingInList(day, meetings) {
     if (meeting.user == null) {
       planning += `
       <input type="text" name="idMeeting" value="${meeting.id}" hidden />
-      <button class="btn btn-primary reserve-meeting">Réserver</button>`
+      <button class="btn btn-primary reserve-meeting" id="reserve-button-${meeting.id}">Réserver</button>`
     }
     else {
       planning += `
-      <button class="btn btn-danger">Occupé</button>
+      <button class="btn btn-danger" id="reserve-button-${meeting.id}">Occupé</button>
       `
     }
   }

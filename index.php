@@ -28,7 +28,6 @@ else                            $user = null;
 
 
 // Redirection selon l'URL
-
 if ($method == "GET") {
     if ($uri == "/")                        require_once "index.html";
     elseif ($uri == "/login")               $cntrlLogin->getConnectionForm();
@@ -45,6 +44,7 @@ if ($method == "GET") {
     elseif ($uri == "/specialities")        $cntrlApp->getSpecialities();
     elseif ($uri == "/rendezvous/result")   $cntrlApp->getMedecin();
     elseif ($uri == "/rendezvous/medecin/disponibilites")   $cntrlApp->dispoMedecin();
+    elseif ($uri == "/rendezvous/cancel")                   $cntrlApp->getCancelMeeting();
     else             header("Location: ". 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}"); //Sanitize the HTTP_ value in sg $_SERVER and relocate to the root document
 }
 elseif ($method == "POST") {
@@ -52,10 +52,10 @@ elseif ($method == "POST") {
     elseif ($uri == "/register/result")                     $cntrlLogin->getRegisterResult();
     elseif($uri == '/espacedoc/creation/result')            $cntrlLogin->getRegisterDocResult();
     elseif ($uri === "/disconnect")                         $utils->destructSession();
-    elseif ($uri == "/rendezvous/medecin/result")           $cntrlApp->userReservation();
     elseif ($uri == '/rendezvous/cancel')                   $cntrlApp->getCancelMeeting();
     elseif($uri == '/espacedoc/result')                     $cntrlApp->createMeeting();
     elseif($uri == '/espacedoc/delete')                     $cntrlApp->deleteMeeting();
     elseif($uri == '/account/result')                       $cntrlLogin->getAccountEditResult();
+    elseif ($uri == '/rendezvous/medecin/reserver')         $cntrlApp->userReservation();
     else             header("Location: ". 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}"); //Sanitize the HTTP_ value in sg $_SERVER and relocate to the root document
 }
