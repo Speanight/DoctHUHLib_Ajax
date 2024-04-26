@@ -17,7 +17,7 @@
 function ajaxRequest(type, url, callback, data = null)
 {
   let xhr;
-  console.log(url);
+  console.log(url + "?" + data);
 
   // Create XML HTTP request.
   xhr = new XMLHttpRequest();
@@ -304,75 +304,9 @@ function loadSantePage(data){
 
     let buttons_cancel = document.getElementsByClassName("btn-rdv-cancel");
     for (let i = 0; i < buttons_cancel.length; i++) {
-      buttons_cancel[i].addEventListener("click", () => {
-        ajaxRequest("GET", "/rendezvous/cancel", checkErrorMessage, "id=" + buttons_cancel[i].previousElementSibling.value);
-        document.getElementById("tableRow-" + buttons_cancel[i].previousElementSibling.value).remove();
-      })
+      buttons_cancel[i].addEventListener("click", refreshButtonCancelMeeting);
     }
   });
-}
-
-/**
- * Collects an array of meetings and returns them in the form of an array. Mainly used
- * for the page "Espace santé" if there is any meeting that meets the requirements.
- * - The function will automatically add (or not) the cancel button depending of the date.
- * @param {array} meetings 
- * @returns string - contains a table with all the arrays.
- */
-function showMeetingsInTable(meetings) {
-  let content = `
-  <table class="table">
-  <thead>
-  <tr>
-      <th scope="col">Date</th>
-      <th scope="col">Plage horaire</th>
-      <th scope="col">Médecin</th>
-      <th scope="col">Spécialité</th>
-      <th scope="col" class="text-center">Actions</th>
-  </tr>
-  </thead>
-  <tbody>
-  `
-
-  let today = new Date();
-  let tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-
-  for (let i = 0; i < meetings.length; i++) {
-    let date = new Date(meetings[i].beginning.date);
-    content += `
-    <tr id="tableRow-${meetings[i].id}">
-        <td>${meetings[i].beginning.date.split(" ")[0]}</td>
-        <td>${meetings[i].beginning.date.split(" ")[1].split(".")[0]} - ${meetings[i].ending.date.split(" ")[1].split(".")[0]}</td>
-        <td>${meetings[i].medecin.surname} ${meetings[i].medecin.name}</td>
-        <td>${meetings[i].medecin.speciality.type}</td>
-        <td class="d-flex flex-row justify-content-around">
-            <input type="text" name="idMedecin" value="${meetings[i].medecin.id}" hidden />
-            <button type="submit" class="btn btn-info btn-rdv-medecin">Réserver un autre RDV</button>
-    `
-    if (date >= tomorrow) {
-      content += `
-        <input type="text" name="idMeeting" value="${meetings[i].id}" hidden>
-        <button type="submit" class="btn btn-danger btn-rdv-cancel">Annuler</button>
-      `
-    }
-    else if (date >= today) {
-      content += `
-        <button type="submit" class="btn btn-danger" title="Vous ne pouvez annuler un rendez-vous que 24h en avance" disabled>Annuler</button>
-      `
-    }
-
-    content += `
-        </td>
-      </tr>
-    `
-  }
-
-  content += `
-      </tbody>
-    </table>
-  `
-
-  return content;
 }
 
 /**
@@ -405,75 +339,7 @@ if (document.getElementById("initialLoad") !== null) {
 //------------------------------------------------------------------------------
 //--- Functions for getting a meeting ---------------------------------------------------------------
 //------------------------------------------------------------------------------
-function displayMeetingsToUser(data) {
-  let meetings = data["medecin"]["meetings"];
-  for (const day in meetings) {
-    let today = new Date();
-    let meetingDay = new Date(day);
 
-    if (meetingDay > today) {
-      printMeetingInList(day, meetings[day]);
-    }
-  }
-
-  // Make the buttons word and book a meeting.
-  let buttons = document.getElementsByClassName("reserve-meeting");
-  for (let i = 0; i < buttons.length; i++) {
-    // TODO: Fix - réserver un RDV au dessus décale tout ceux du dessous après.
-    buttons[i].addEventListener("click", () => {
-      ajaxRequest("POST", "/rendezvous/medecin/reserver", reserveMeetingResult, "id=" + buttons[i].previousElementSibling.value);
-      
-    })
-    
-  }
-}
-
-function reserveMeetingResult(data) {
-  checkErrorMessage(data);
-  if ("success" in data) {
-    let button = document.getElementById("reserve-button-" + data["success"])
-    button.classList = "btn btn-warning";
-    button.innerHTML = "Votre horaire";
-  }
-}
-
-function printMeetingInList(day, meetings) {
-  let elementArea = document.getElementById("meetings-area");
-  let planning = `<h1>${day}</h1>
-  <table class="table">
-    <thead>
-    <tr>
-      <th scope="col">Début</th>
-      <th scope="col">Fin</th>
-      <th scope="col"></th>
-    </tr>
-    </thead>
-    <tbody>`
-
-  for(const meeting of meetings) {
-    const beginning = meeting.beginning.date.split(" ")[1].substring(0, 5);
-    const ending = meeting.ending.date.split(" ")[1].substring(0, 5);
-    planning += `
-    <tr>
-      <td>${beginning}</td>
-      <td>${ending}</td>
-      <td>
-    `
-    if (meeting.user == null) {
-      planning += `
-      <input type="text" name="idMeeting" value="${meeting.id}" hidden />
-      <button class="btn btn-primary reserve-meeting" id="reserve-button-${meeting.id}">Réserver</button>`
-    }
-    else {
-      planning += `
-      <button class="btn btn-danger" id="reserve-button-${meeting.id}">Occupé</button>
-      `
-    }
-  }
-  planning += `</td>`
-
-  elementArea.innerHTML += planning;
-}
 
 
 //------------------------------------------------------------------------------
@@ -497,3 +363,16 @@ document.getElementById("disconnect").addEventListener("click", () => {
     ajaxRequest("POST", "/disconnect", onceDisconnected);
 })
 
+
+//------------------------------------------------------------------------------
+//------- Function used by eventListeners (used to remove to refresh) ----------
+//------------------------------------------------------------------------------
+function refreshButtonCancelMeeting() {
+  ajaxRequest("GET", "/rendezvous/cancel", checkErrorMessage, "id=" + this.id.slice(-1));
+  document.getElementById("tableRow-" + this.id.split("-")[2]).remove();
+
+  let buttons_cancel = document.getElementsByClassName("btn-rdv-cancel");
+  for (let i = 0; i < buttons_cancel.length; i++) {
+    buttons_cancel[i].addEventListener("click", refreshButtonCancelMeeting);
+  }
+}
