@@ -167,8 +167,8 @@ function clearCalendar(){
 function insertMeetings(meetings){
     clearCalendar();
     meetings.forEach((m, j) => {
-        let begin = new Date(m.beginning);
-        let end = new Date(m.ending);
+        let begin = new Date(m.beginning.date);
+        let end = new Date(m.ending.date);
         let timestamp = begin.getHours().toString().padStart(2, '0')+"h"+begin.getMinutes().toString().padStart(2, "0") + " - " + end.getHours().toString().padStart(2, '0')+"h"+end.getMinutes().toString().padStart(2, "0");
         if (m.user != null){ //Non-affected meeting
             let fullName = capitalizeFirstLetter(m.user.name) + " " + m.user.surname;
@@ -255,6 +255,8 @@ function insertMeetings(meetings){
                     </tr>
             `
         }
+        console.log(begin);
+        console.log("target"+begin.getDay());
         let target = document.getElementById("target"+begin.getDay());
         target.insertAdjacentHTML("beforeend", bubble)
     });

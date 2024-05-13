@@ -58,7 +58,7 @@ class DaoMeeting {
                                 AND DATE(beginning) >= :beg
                                 AND DATE(beginning) <= :end
                                 OR (DATE(beginning) = :beg AND id_user = :id)
-                                OR (DATE(beginning) = :end AND id_user = :id)"); //This is an absolute bullshit from postgresql. It makes weird conversion between timestamp and date making the <= or >= excluding the limits
+                                OR (DATE(beginning) = :end AND id_user = :id) ORDER BY beginning"); //This is an absolute bullshit from postgresql. It makes weird conversion between timestamp and date making the <= or >= excluding the limits
                                                         //You need to manually include the upper and lower limit with an OR statement
             $statement->bindParam(":id", $idUser);
             $statement->bindParam(":beg", $beg);
