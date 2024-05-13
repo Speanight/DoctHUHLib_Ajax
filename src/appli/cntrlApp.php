@@ -248,7 +248,6 @@ class cntrlApp {
 
     public function dispoMedecin() {
         $user = $_SESSION['user'];
-        $alerts = [];
         $ajax = [];
 
         $daoUser = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
