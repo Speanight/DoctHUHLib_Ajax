@@ -27,7 +27,7 @@ function ajaxRequest(type, url, callback, data = null)
     {
       case 200:
       case 201:
-        // console.log(xhr.responseText);
+        console.log(xhr.responseText);
         callback(JSON.parse(xhr.responseText));
         break;
       default:
@@ -76,15 +76,14 @@ function displayPage(data) { //Group header+footer and load the user datas
   document.write(page);
   document.close();
 
-  document.addEventListener("DOMContentLoaded", function() {
-    displayDatas(user);
-    hideElementUser(data);
-  }, false);
+  // document.addEventListener("DOMContentLoaded", function() {
+  //   displayDatas(user);
+  // }, false);
 }
 
-function displayDatas(user) {
+function displayDatas(data) {
+  let user = data["user"];
   let fullname = document.getElementsByClassName("user-fullname");
-  console.log(fullname);
   for (let i = 0; i < fullname.length; i++) {
     fullname[i].innerHTML = user["surname"] + " " + user["name"];
   }
@@ -97,9 +96,20 @@ function displayDatas(user) {
   for (const key in user) {
     displayUserData(user, key);
   }
+
+  hideElementUser(user);
 }
 
-/*
+function displayNextMeeting(data) {
+  if (data === null) {
+    let elements = document.getElementsByClassName("meeting-not-none");
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].style.display = "none";
+    }
+  }
+}
+
+/**
 Function used by displayUserDatas (with an 'S') to avoid repetition.
 It searches the whole page for classes called "user-" + data,
 where data is the data it searches for.
@@ -124,9 +134,9 @@ function displayUserData(user, data) {
   }
 }
 
+// TODO: fix fonction hide elements.
 function hideElementUser(data) {
-  user = data["user"];
-
+  // let user = data[0];
   let domNone = document.getElementsByClassName("user-none");
   let domPatient = document.getElementsByClassName("user-patient");
   let domPracticien = document.getElementsByClassName("user-practicien");
@@ -145,7 +155,7 @@ function hideElementUser(data) {
     }
   }
   else {
-    if (user["place"] === undefined) {
+    if (user[0]["speciality"] === undefined) {
       for (let i = 0; i < domPracticien.length; i++) {
         domPracticien[i].style.display = "none";
       }
@@ -173,23 +183,57 @@ function hideElementUser(data) {
     }
   }
 }
+//------------------------------------------------------------------------------
+//--- Utils func ---------------------------------------------------------------
+//------------------------------------------------------------------------------
+// A list of specific utilities function that are not natively implemented in JavaScript
+function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * This function check if the backend sent back an error/warning/info message and print it to the current page.
+ * It can be called each time you expect a potential return message. Don't forget to do an early return
+ * @param {array} data - The JSON decoded array returned by the backend.
+ * @returns {boolean} True if there is a message, False otherwise
+ */
+function checkErrorMessage(data){
+  if('message' in data){
+    document.body.insertAdjacentHTML("afterend", data["message"]);
+    setTimeout( () => {
+      Array.from(document.getElementsByClassName("errorWrapper")).forEach((elem) => {
+        elem.remove();
+      });
+    }, 3000);
+
+  }
+  return 'message' in data;
+}
 
 //------------------------------------------------------------------------------
 //--- Loading page block ---------------------------------------------------------------
 //------------------------------------------------------------------------------
 // List of functions that loads the corresponding page
 function loadSantePage(data){
-console.log("page santé chargée");
+  displayPage(data)
+  hideElementUser(data)
 }
 function loadAccueil(data){
   displayPage(data);
+  
+  document.addEventListener("DOMContentLoaded", function() {
+    // displayDatas(data);
+  }, false);
 }
 function loadMedecinPage(data){
   console.log("page médecin chargée");
 
 }
 
-ajaxRequest("GET", "/user", hideElementUser);
+document.addEventListener("DOMContentLoaded", function() {
+  ajaxRequest("GET", "/user", displayDatas);
+  ajaxRequest("GET", "/meeting/next", displayNextMeeting);
+})
 
 //Avoid recursive load of ajax.js hence an epileptic loading page
 if (document.getElementById("initialLoad") !== null) {
@@ -207,6 +251,9 @@ document.getElementById("titleButton").addEventListener("click", () => {
     ajaxRequest("GET", "/accueil", loadAccueil);
 
 });
-document.getElementById("esButton").addEventListener("click", loadSantePage);
+document.getElementById("esButton").addEventListener("click", () => {
+  //TODO Check if user is connected. If not, redirect directly to the vconnectioN.php page to execute the php code. If connected, launch the request below
+  ajaxRequest("GET", "/rendezvous", loadSantePage);
+});
 document.getElementById("epButton").addEventListener("click", loadMedecinPage);
 

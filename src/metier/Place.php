@@ -74,7 +74,7 @@ class Place {
         $place["num_street"]    = $this->num_street;
         $place["street"]        = $this->street;
         $place["code_insee"]    = $this->code_insee;
-        $place["city"]          = $this->city;
+        $place["city"]          = $this->city->cityToArray();
 
         return $place;
     }

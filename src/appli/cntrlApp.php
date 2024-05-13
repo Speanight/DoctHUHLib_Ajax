@@ -17,7 +17,6 @@ class cntrlApp {
         }
         $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
         $ajax["html"] = file_get_contents(PATH_VIEW . "vaccueil.html");
-        $ajax["user"] = $user->userToArray();
 
         print_r(json_encode($ajax));
     }
@@ -38,8 +37,10 @@ class cntrlApp {
                 if ($meeting->get_beginning() < $today) array_push($pastMeetings, $meeting);
                 else                                    array_unshift($futureMeetings, $meeting);
             }
+            $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
+            $ajax["html"] = file_get_contents(PATH_VIEW . "vrendezvous.html");
+            print_r(json_encode($ajax));
 
-            require PATH_VIEW . "vrendezvous.php";
         }
         else require PATH_VIEW . "vconnection.php";
     }
@@ -121,40 +122,52 @@ class cntrlApp {
     public function getMedecin(){
         $DaoUser = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
         $utils = new Utils();
-        $specialite = $_POST["specialite"];
-        $nom = $_POST["nom"];
+        $specialite = $_GET["specialite"];
+        $nom = $_GET["nom"];
 
         if(!empty($nom) && !($utils->isSanitize($nom))){
-            $utils->echoWarning("Le champ de recherche ne peut contenir ni caractères spéciaux ni accents");
-            require PATH_VIEW . "vrendezvous.php";
+            $ajax["message"] = $utils->echoWarning("Le champ de recherche ne peut contenir ni caractères spéciaux ni accents");
+            print_r(json_encode($ajax));
             return;
         }
 
         if(!empty($nom)){
-            $nom = explode(" ", $_POST["nom"]); //Array that separates the name from the surname. [0] => surname, [1] => name
+            $nom = explode(" ", $nom); //Array that separates the name from the surname. [0] => surname, [1] => name
             if(isset($nom[1])){ //The user inputed a name and a surname
                 $users = $DaoUser->getByUserSpe($nom[0], $nom[1], $specialite);
+                print_r(json_encode($users)); //The getByUserSpe() function is somewhat called two times when the result is printed inside it's prototype. So i manually print each time the doc array
             }
             else{ //Tests each name and surname in cas the user inputed only one thing
                 $u1 = $DaoUser->getByUserSpe(" ", $nom[0], $specialite);
                 $u2 = $DaoUser->getByUserSpe($nom[0], " ", $specialite);
                 if(!empty($u1)){
                     $users = $u1;
+                    print_r(json_encode($users));
                 }
                 else if (!empty($u2)){
                     $users = $u2;
+                    print_r(json_encode($users));
                 }
-                elseif($specialite == "Sélectionner la spécialité") $utils->echoInfo("Aucun praticien trouvé");
+                elseif($specialite == "Sélectionner la spécialité"){
+                    $ajax["message"] = $utils->echoInfo("Veuillez sélectionner une spécialité");
+                    print_r(json_encode($ajax));
+                }
             }
         }
+
         else {
             if(empty($nom)) {
                 $users = $DaoUser->getByUserSpe(" ", " ", $specialite);
-            }
-            if(empty($users)) {
-                    $utils->echoInfo("Aucun practicien trouvé");
+                if(empty($users)) { // Check if $users is empty
+                    $ajax["message"] = $utils->echoInfo("Aucun praticien trouvé");
+                    print_r(json_encode($ajax));
+                } else {
+                    print_r(json_encode($users));
+                }
             }
         }
+
+
         $user = $_SESSION['user'];
         $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
         $meetings   = $daoMeeting->getMeetingsOfPatient($user);
@@ -170,8 +183,7 @@ class cntrlApp {
             if ($meeting->get_beginning() < $today) array_push($pastMeetings, $meeting);
             else                                    array_push($futureMeetings, $meeting);
         }
-
-        require PATH_VIEW . "vrendezvous.php";
+        //TODO If needed (cause the upper section it a duplicata of a bit of code already executed, see getRendezVous() wich already loads the meetings), echo the pastMeetings and futureMeetings array ton insert them later with js.
     }
 
     public function dispoMedecin() {
@@ -283,5 +295,20 @@ class cntrlApp {
         }
 
         require PATH_VIEW . "vrendezvous.php";
+    }
+
+
+    public function getNextMeeting() {
+        $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
+        $user = $_SESSION['user'];
+
+        print_r(json_encode($daoMeeting->getNextMeeting($user)));
+    }
+
+    public function getSpecialities(){
+    $daoSpeciality = new DaoSpeciality(DBHOST, DBNAME, PORT, USER, PASS);
+
+
+    print_r(json_encode($daoSpeciality->getSpeciality()));
     }
 }
