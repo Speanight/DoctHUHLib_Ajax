@@ -165,5 +165,4 @@ $cityArray = $DaoCity->getAllCities();
             <button class="btn btn-dark btn-sm btn-block" type="submit">Créer un compte</button>
         </div>
     </form>
-
 </div>

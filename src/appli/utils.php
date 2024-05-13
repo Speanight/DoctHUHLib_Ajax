@@ -7,7 +7,7 @@ const PATH_VIEW = "src/view/";
 const PATH_CSS = "src/css/";
 const DBHOST = "localhost";
 const DBNAME = "themightypoo";
-const PORT = 5433;
+const PORT = 5432;
 const USER = "postgres";
 const PASS = "Isen44N";
 
@@ -201,18 +201,5 @@ class Utils {
 
         return $bilan;
     }
-<<<<<<< HEAD
-    public function isConnected(){
-        $user = $_SESSION["user"];
-        if(isset($user)){
-            $this->savePicture($user->get_id(), "img", "assets/img/");
-            return true;
-        }
-        else{ return false;
-        }
-    }
 }
 
-=======
-}
->>>>>>> main
