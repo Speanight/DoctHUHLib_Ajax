@@ -3,7 +3,6 @@
 //--- onLoad block function---------------------------------------------------------------
 //------------------------------------------------------------------------------
 // List of functions that loads immediatly after the DOM is generated
-console.log("vmedinjs loaded");
 ajaxRequest("GET", "/espacedoc/context", insertContext);
 document.getElementById("loadWeek").addEventListener("click", loadWeek);
 

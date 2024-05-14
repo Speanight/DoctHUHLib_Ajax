@@ -93,13 +93,8 @@ document.getElementById("searchDoc").addEventListener("click", () => {
 function displayMeetingsToUser(data) {
     let meetings = data["medecin"]["meetings"];
     for (const day in meetings) {
-      let today = new Date();
-      let meetingDay = new Date(day);
-  
-      if (meetingDay > today) {
         printMeetingInList(day, meetings[day]);
       }
-    }
   
     // Make the buttons word and book a meeting.
     let buttons = document.getElementsByClassName("reserve-meeting");
@@ -125,7 +120,9 @@ function reserveMeetingResult(data) {
 
 function printMeetingInList(day, meetings) {
     let elementArea = document.getElementById("meetings-area");
-    let planning = `<h1>${day}</h1>
+    let today = new Date();
+    let dayParsed = new Date(day);
+    let planning = `<h1>${dayParsed.toDateString()}</h1>
     <table class="table">
         <thead>
         <tr>
@@ -135,28 +132,32 @@ function printMeetingInList(day, meetings) {
         </tr>
         </thead>
         <tbody>`
-
     for(const meeting of meetings) {
         const beginning = meeting.beginning.date.split(" ")[1].substring(0, 5);
         const ending = meeting.ending.date.split(" ")[1].substring(0, 5);
-        planning += `
-        <tr>
-        <td>${beginning}</td>
-        <td>${ending}</td>
-        <td>
-        `
-        if (meeting.user == null) {
-        planning += `
-        <button class="btn btn-primary reserve-meeting" id="reserve-button-${meeting.id}">Réserver</button>`
-        }
-        else {
-        planning += `
-        <button class="btn btn-danger" id="reserve-button-${meeting.id}">Occupé</button>
-        `
-        }
+        const meetingDate = new Date(day+ " " +beginning);
+        console.log("day vs beginiing");
+        console.log(meetingDate + "\<beg  today\>" + today);
+        if(meetingDate > today){
+                    planning += `
+                <tr>
+                <td>${beginning}</td>
+                <td>${ending}</td>
+                <td>
+                `
+                    if (meeting.user == null) {
+                        planning += `
+                <button class="btn btn-primary reserve-meeting" id="reserve-button-${meeting.id}">Réserver</button>`
+                    }
+                    else {
+                        planning += `
+                <button class="btn btn-danger" id="reserve-button-${meeting.id}">Occupé</button>
+                `
+                    }
+
+                }
     }
     planning += `</td>`
-
     elementArea.innerHTML += planning;
 }
 
@@ -164,7 +165,7 @@ function printMeetingInList(day, meetings) {
 /**
  * Collects an array of meetings and returns them in the form of an array. Mainly used
  * for the page "Espace santé" if there is any meeting that meets the requirements.
- * - The function will automatically add (or not) the cancel button depending of the date.
+ * - The function will automatically add (or not) the cancel button depending on the date.
  * @param {array} meetings 
  * @returns string - contains a table with all the arrays.
  */
@@ -191,7 +192,7 @@ function showMeetingsInTable(meetings) {
       content += `
       <tr id="tableRow-${meetings[i].id}">
           <td>${meetings[i].beginning.date.split(" ")[0]}</td>
-          <td>${meetings[i].beginning.date.split(" ")[1].split(".")[0]} - ${meetings[i].ending.date.split(" ")[1].split(".")[0]}</td>
+          <td>${meetings[i].beginning.date.split(" ")[1].split(".")[0].substring(0, 5)} - ${meetings[i].ending.date.split(" ")[1].split(".")[0].substring(0, 5)}</td>
           <td>${meetings[i].medecin.surname} ${meetings[i].medecin.name}</td>
           <td>${meetings[i].medecin.speciality.type}</td>
           <td class="d-flex flex-row justify-content-around">
