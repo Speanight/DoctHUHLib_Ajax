@@ -29,7 +29,7 @@ $speArray = $DaoSpeciality->getSpeciality();
             </div>
 
             <!--<?php if (!empty($users[0])) { ?> -->
-            <table class="table align-middle mb-0 bg-white">
+            <table class="table align-middle mb-0 bg-white d-none" id="baseTable">
                 <thead class="bg-light">
                 <tr>
                     <th>Nom</th>
@@ -45,6 +45,9 @@ $speArray = $DaoSpeciality->getSpeciality();
             </table>
         </div>
 
+        <div class="mt-4" id="futureMeetings"></div>
+
+        <div class="mt-4" id="pastMeetings"></div>
 
         <!--<?php if(sizeof($futureMeetings) != 0) { ?>
         <div class="mt-4">

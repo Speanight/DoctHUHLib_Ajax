@@ -45,13 +45,29 @@ class DaoMeeting {
         return $meeting;
     }
 
-    public function getMeetingsOfDoctor(User $user) {
+    public function getMeetingsOfDoctor(User $user, $currentWeek = null) {
         $idUser = $user->get_id();
-        $statement = $this->db->prepare("SELECT * FROM meeting WHERE id_user = :id ORDER BY beginning");
-        $statement->bindParam(":id", $idUser);
+        if($currentWeek == null){ //all meetings of doctor requested
+            $statement = $this->db->prepare("SELECT * FROM meeting WHERE id_user = :id ORDER BY beginning");
+            $statement->bindParam(":id", $idUser);
+        }
+        else { //meetings of the selected week requested
+            $beg = strval($currentWeek->getBegin()->format("Y-m-d"));
+            $end = $currentWeek->getEnd()->format("Y-m-d");
+            $statement = $this->db->prepare("SELECT * FROM meeting WHERE id_user = :id
+                                AND DATE(beginning) >= :beg
+                                AND DATE(beginning) <= :end
+                                OR (DATE(beginning) = :beg AND id_user = :id)
+                                OR (DATE(beginning) = :end AND id_user = :id) ORDER BY beginning"); //This is an absolute bullshit from postgresql. It makes weird conversion between timestamp and date making the <= or >= excluding the limits
+                                                        //You need to manually include the upper and lower limit with an OR statement
+            $statement->bindParam(":id", $idUser);
+            $statement->bindParam(":beg", $beg);
+            $statement->bindParam(":end", $end);
+        }
         $statement->execute();
         $array = $statement->fetchAll(PDO::FETCH_ASSOC);
-        $return = [];
+        $result = [];
+
 
         $daoPlace = new DaoPlace(DBHOST, DBNAME, PORT, USER, PASS);
         $daoUser = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
@@ -63,10 +79,10 @@ class DaoMeeting {
             $beginning = DateTime::createFromFormat('Y-m-d H:i:s', $elem['beginning']);
             $ending = DateTime::createFromFormat('Y-m-d H:i:s', $elem['ending']);
             $timeslot = new Meeting($elem['id'], $beginning, $ending, $place, $user, $patient);
-            array_push($return, $timeslot);
+            array_push($result, $timeslot);
         }
 
-        return $return;
+        return $result;
     }
 
     public function getMeetingsOfPatient(User $user) {
@@ -161,17 +177,20 @@ class DaoMeeting {
         $statement->bindParam(":id_user", $idUser);
         return $statement->execute();
     }
-    public function deleteMeeting(string $tbeg, int $idDoc){
+    public function deleteMeeting(string $idMeeting, int $idDoc) : void{
         $utils = new Utils();
-        $statement = $this->db->prepare("DELETE from meeting WHERE id_user = :idDoc AND beginning = :tbeg");
+        $statement = $this->db->prepare("DELETE from meeting WHERE id_user = :idDoc AND id = :idMeeting");
         $statement->bindParam(":idDoc", $idDoc );
-        $statement->bindParam(":tbeg", $tbeg);
+        $statement->bindParam(":idMeeting", $idMeeting);
         try {
             $statement->execute();
-            $utils->echoSuccess("Horaire supprimé");
+            $ajax["message"] = $utils->echoSuccess("Horaire supprimé");
+            print_r(json_encode($ajax));
+
         }
         catch (PDOException $e){
-            $utils->echoError("Erreur lors de la suppression de la plage");
+            $ajax["message"] = $utils->echoError("Erreur lors de la suppression de la plage");
+            print_r(json_encode($ajax));
         }
     }
 }

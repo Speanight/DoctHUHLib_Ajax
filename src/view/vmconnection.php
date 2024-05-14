@@ -30,6 +30,7 @@ $cityArray = $DaoCity->getAllCities();
                 aria-describedby="basic-addon1"
                 name="surname"
                 value="<?php if(isset($surname)){echo $surname;}?>"
+                required
             />
         </div>
         <div class="input-group mb-3">
@@ -42,6 +43,7 @@ $cityArray = $DaoCity->getAllCities();
                 aria-describedby="basic-addon2"
                 name="name"
                 value="<?php if(isset($name)){echo $name;}?>"
+                required
 
             />
         </div>
@@ -55,6 +57,7 @@ $cityArray = $DaoCity->getAllCities();
                 aria-describedby="basic-addon2"
                 name="phone"
                 value="<?php if(isset($phone)){echo $phone;}?>"
+                required
 
             />
         </div>
@@ -67,6 +70,7 @@ $cityArray = $DaoCity->getAllCities();
                 aria-label="Amount (to the nearest dollar)"
                 name="mail"
                 value="<?php if(isset($mail)){echo $mail;}?>"
+                required
 
             />
         </div>
@@ -77,6 +81,7 @@ $cityArray = $DaoCity->getAllCities();
                 class="form-control"
                 aria-label="Amount (to the nearest dollar)"
                 name="password"
+                required
             />
         </div>
         <div class="input-group mb-3">
@@ -86,6 +91,7 @@ $cityArray = $DaoCity->getAllCities();
                     class="form-control"
                     aria-label="Amount (to the nearest dollar)"
                     name="passwordVerify"
+                    required
             />
         </div>
         <div class="input-group mb-3">
@@ -97,6 +103,7 @@ $cityArray = $DaoCity->getAllCities();
                     aria-describedby="basic-addon2"
                     name="id_p"
                     value="<?php if(isset($idPraticien)){echo $idPraticien;}?>"
+                    required
 
             />
         </div>
@@ -112,6 +119,7 @@ $cityArray = $DaoCity->getAllCities();
                 aria-label="Username"
                 name="num"
                 value="<?php if(isset($numStreet)){echo $numStreet;}?>"
+                required
 
             />
             <span class="input-group-text">Adresse postale</span>
@@ -122,6 +130,7 @@ $cityArray = $DaoCity->getAllCities();
                 aria-label="Server"
                 name="street"
                 value="<?php if(isset($street)){echo $street;}?>"
+                required
 
             />
             <span class="input-group-text">Ville</span>
@@ -132,6 +141,7 @@ $cityArray = $DaoCity->getAllCities();
                     aria-label="Server"
                     name="city"
                     value="<?php if(isset($city)){echo ucfirst($city);}?>"
+                    required
 
             />
         </div>
@@ -145,6 +155,7 @@ $cityArray = $DaoCity->getAllCities();
                     aria-describedby="basic-addon2"
                     name="name_e"
                     value="<?php if(isset($namePlace)){echo $namePlace;}?>"
+                    required
 
             />
         </div>

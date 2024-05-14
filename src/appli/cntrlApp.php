@@ -5,6 +5,10 @@ require_once "src/dao/DaoSpeciality.php";
 require_once "src/dao/DaoMeeting.php";
 
 class cntrlApp {
+    /**
+     * Returns the header and html of the welcome page "vaccueil.html".
+     * @return void
+     */
     public function getAccueil() {
         $cntrlLogin = new cntrlLogin();
         if (isset($_SESSION['user'])) {
@@ -20,6 +24,17 @@ class cntrlApp {
 
         print_r(json_encode($ajax));
     }
+
+    /**
+     * Returns the header and html of the doctor managing page "vmedecin.html".
+     * @return void
+     */
+    public function getDocPage() : void {
+        $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
+        $ajax["html"] = file_get_contents(PATH_VIEW . "vmedecin.html");
+        print_r(json_encode($ajax));
+    }
+
     public function getRendezVous() {
         if(isset($_SESSION["user"])){
             $user       = $_SESSION['user'];
@@ -34,37 +49,59 @@ class cntrlApp {
             $futureMeetings = [];
 
             foreach ($meetings as $meeting) {
-                if ($meeting->get_beginning() < $today) array_push($pastMeetings, $meeting);
-                else                                    array_unshift($futureMeetings, $meeting);
+                if ($meeting->get_beginning() < $today) array_push($pastMeetings, $meeting->meetingToArray());
+                else                                    array_unshift($futureMeetings, $meeting->meetingToArray());
             }
             $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
             $ajax["html"] = file_get_contents(PATH_VIEW . "vrendezvous.html");
+            if (sizeof($futureMeetings) > 0)    $ajax["futureMeetings"] = $futureMeetings;
+            if (sizeof($pastMeetings) > 0)      $ajax["pastMeetings"] = $pastMeetings;
             print_r(json_encode($ajax));
 
         }
-        else require PATH_VIEW . "vconnection.php";
+        else require PATH_VIEW . "vconnection.php"; // TODO: fix - Pas de require en AJAX!
     }
-    public function getDocPage() {
 
+    /**
+     * This function gathers the week selected by the user (current in time week if not specified), the meetings of the user connected,
+     * and the incoming weeks.
+     * @return void
+     */
+    public function getDocPlanning() {
         $DaoTimeslot = new DaoTime(DBHOST, DBNAME, PORT, USER, PASS);
         $DaoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
         $weekArray = $DaoTimeslot->getFutureWeeks();
-        if(isset($_POST["selectedWeek"]) && $_POST["selectedWeek"] != -1){
-            $currentWeek = $weekArray[$_POST["selectedWeek"]];
+        if(isset($_GET["selectedWeek"]) && $_GET["selectedWeek"] != -1){
+            $currentWeek = $weekArray[$_GET["selectedWeek"]];
+            $ajax["selectedWeek"] = $_GET["selectedWeek"]; //persistence of the selected week
         }
-        elseif(isset($_POST["persistWeek"]) && $_POST["persistWeek"] != -1){
-            $currentWeek = $weekArray[$_POST["persistWeek"]];
-            $_POST["selectedWeek"] = $_POST["persistWeek"];
+        else{
+            $currentWeek = $weekArray[0];
+            $ajax["selectedWeek"] = -1;
         }
-        else $currentWeek = $weekArray[0];
 
-        $meetings = $DaoMeeting->getMeetingsOfDoctor($_SESSION["user"]);
+        $meetings = $DaoMeeting->getMeetingsOfDoctor($_SESSION["user"], $currentWeek);
+        foreach($meetings as &$m){
+            $m = $m->meetingToArray();
+        }
         if(!isset($utils)){
             $utils = new Utils();
         }
-        require PATH_VIEW . "vmedecin.php";
+        foreach($weekArray as &$w){
+            $w = $w->weekToArray();
+        }
+        $ajax["currentWeek"] = $currentWeek->weekToArray();
+        $ajax["meetings"] = $meetings;
+        $ajax["weekArray"] = $weekArray;
+        print_r(json_encode($ajax));
     }
-    public function createMeeting(){
+
+    /**
+     * This function gathers the date, beginning and ending of the metting to create, checks different scenarios and ultimatly insert
+     * the meeting in the database if every field is correct
+     * @return void
+     */
+    public function createMeeting() : void{
         $user = $_SESSION['user'];
         $now = new DateTime();
         $now->modify("+1 hour");
@@ -78,48 +115,71 @@ class cntrlApp {
         $DaoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
         $utils = new Utils();
         $date = $_POST["date"];
+        $date = substr($date, 5); //Specific parsing to remove the day prefix because it's specific to the system language allowing
+                                        //the date creation to be independent of the user system
         $ts = $_POST["timeStart"];
         $te = $_POST["timeEnd"];
+
         if(empty($ts) || empty($te)){
-            $utils->echoWarning("Vous devez spécifier un horaire");
-            $this->getDocPage();
+            $ajax["message"] = $utils->echoWarning("Vous devez spécifier un horaire");
+            print_r(json_encode($ajax));
             return;
         }
 
-        $beg = DateTime::createFromFormat('D. d/m/Y H:i', $date. " ".$ts);
-        $end = DateTime::createFromFormat('D. d/m/Y H:i', $date. " ".$te);
+        $beg = DateTime::createFromFormat('d/m/Y H:i', $date. " ".$ts);
+        $end = DateTime::createFromFormat('d/m/Y H:i', $date. " ".$te);
         if($beg < $now){
-            $utils->echoError("Vous ne pouvez créer de rendez-vous antérieur à aujourd'hui");
-            $this->getDocPage();
+            $ajax["message"] = $utils->echoError("Vous ne pouvez créer de rendez-vous antérieur à aujourd'hui");
+            print_r(json_encode($ajax));
             return;
+
         }
         if($beg >= $end){
-            $utils->echoError("Cet horaire est incorrect");
-            $this->getDocPage();
+            $ajax["message"] = $utils->echoError("Cet horaire est incorrect");
+            print_r(json_encode($ajax));
             return;
         }
         if(!$beg || !$end){
-            $utils->echoError("Erreur lors de la création du rendez-vous");
+            $ajax["message"] = $utils->echoError("Erreur lors de la création du rendez-vous");
+            print_r(json_encode($ajax));
+            return;
         }
         $isSuccess = $DaoMeeting->insertMeeting($beg, $end, $_SESSION["user"]);
         if($isSuccess){
-            $utils->echoSuccess("Rendez-vous enregistré avec succès");
+            $ajax["message"] = $utils->echoSuccess("Rendez-vous enregistré avec succès");
+            print_r(json_encode($ajax));
         }
         else {
-            $utils->echoError("Cet horaire existe déjà");
+            $ajax["message"] = $utils->echoError("Cet horaire existe déjà");
+            print_r(json_encode($ajax));
         }
-        $this->getDocPage();
-
     }
-    public function deleteMeeting(){
-        $DaoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
+
+    /**
+     * This function gathers the id of the meeting to delete and then deletes it from the database if the user who
+     * threw the call is the correct-connected user
+     * @return void
+     */
+    public function deleteMeeting() : void{
+        $utils = new Utils();
+        $user = $_SESSION["user"];
         $idDoc = $_POST["idDoc"];
-        $tbeg = $_POST["tbeg"];
-        $DaoMeeting->deleteMeeting($tbeg, $idDoc);
-        $this->getDocPage();
+        if($idDoc != $user->get_id()){ //Malicious user tried to craft a request to delete a non-propretary meeting
+            $ajax["message"] = $utils->echoError("Vous n'êtes pas autorisé à faire ceci");
+            print_r(json_encode($ajax));
+            return;
+        }
+        $DaoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
+        $idMeeting = $_POST["idMeeting"];
+        $DaoMeeting->deleteMeeting($idMeeting, $idDoc);
     }
 
-    public function getMedecin(){
+    /**
+     * This function gather the name, surname and speciality searched and then checks each combinaison of [^name]/[^surname].
+     * If no user found, return an appropriate error message
+     * @return void
+     */
+    public function getMedecin() : void{
         $DaoUser = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
         $utils = new Utils();
         $specialite = $_GET["specialite"];
@@ -188,11 +248,12 @@ class cntrlApp {
 
     public function dispoMedecin() {
         $user = $_SESSION['user'];
-        $alerts = [];
+        $ajax = [];
+
         $daoUser = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
         $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
 
-        $idMedecin = $_POST['idMedecin'];
+        $idMedecin = $_GET['id'];
 
         $medecin = $daoUser->getFullById($idMedecin);
         $meetings = $daoMeeting->getMeetingsOfDoctor($medecin);
@@ -202,20 +263,25 @@ class cntrlApp {
 
         foreach ($meetings as $meeting) {
             if ($meeting->get_beginning() > $today) {
-                $day = $meeting->get_beginning()->format('D d/m Y');
+                $day = $meeting->get_beginning()->format('Y-m-d');
                 if (!isset($orderedMeetings[$day])) $orderedMeetings[$day] = [];
                 array_push($orderedMeetings[$day], $meeting);
             }
         }
         $medecin->set_meetings($orderedMeetings);
 
-        require PATH_VIEW . "vhorairesMedecin.php";
+        
+        $ajax["header"] = file_get_contents(PATH_VIEW . "header.html");
+        $ajax["html"] = file_get_contents(PATH_VIEW . "vhorairesMedecin.html");
+        $ajax["medecin"] = $medecin->userToArray();
+
+        print_r(json_encode($ajax));
     }
 
     public function userReservation() {
         $alerts = [];
         $user = $_SESSION['user'];
-        $idMeeting = $_POST['idMeeting'];
+        $idMeeting = $_POST['id'];
 
         $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
         $utils      = new Utils();
@@ -224,10 +290,11 @@ class cntrlApp {
 
         if ($meeting->get_user() == null) {
             $daoMeeting->setUserOfMeeting($meeting, $user);
-            $utils->echoSuccess("Votre rendez-vous a bien été ajouté");
+            $ajax["message"] = $utils->echoSuccess("Votre rendez-vous a bien été ajouté");
+            $ajax["success"] = $idMeeting;
         }
         else {
-            $utils->echoError("Votre rendez-vous n'a pas pu être réservé");
+            $ajax["message"] = $utils->echoError("Votre rendez-vous n'a pas pu être réservé");
         }
 
         $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
@@ -245,7 +312,8 @@ class cntrlApp {
             else                                    array_push($futureMeetings, $meeting);
         }
 
-        require PATH_VIEW . "vrendezvous.php";
+        // require PATH_VIEW . "vrendezvous.php";
+        print_r(json_encode($ajax));
     }
 
     public function getPastMeetings() {
@@ -262,43 +330,21 @@ class cntrlApp {
     }
 
     public function getCancelMeeting() {
-        $alerts = [];
         $user = $_SESSION['user'];
-        $meetingId = $_POST['idMeeting'];
+        $meetingId = $_GET['id'];
 
         $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
         $utils = new Utils();
 
         $meet = $daoMeeting->getMeetingById($meetingId);
         $daoMeeting->cancelMeetingOfPatient($user, $meet);
-        
-        $yesterday = new DateTime();
-        $yesterday = $yesterday->modify('-1 day');
 
-        $utils->echoSuccess("Votre rendez-vous a bien été annulé");
-
-        $meetings = $daoMeeting->getMeetingsOfPatient($user);
-
-        $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
-        $meetings   = $daoMeeting->getMeetingsOfPatient($user);
-        $today      = new DateTime();
-        $today->modify("+1 hour");
-        $tomorrow   = new DateTime();
-        $tomorrow  = $tomorrow->modify('+1 day');
-
-        $pastMeetings   = [];
-        $futureMeetings = [];
-
-        foreach ($meetings as $meeting) {
-            if ($meeting->get_beginning() < $today) array_push($pastMeetings, $meeting);
-            else                                    array_push($futureMeetings, $meeting);
-        }
-
-        require PATH_VIEW . "vrendezvous.php";
+        $ajax["message"] = $utils->echoSuccess("Votre rendez-vous a bien été annulé");
+        print_r(json_encode($ajax));
     }
 
 
-    public function getNextMeeting() {
+    public function getNextMeeting() : void{
         $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
         $user = $_SESSION['user'];
 

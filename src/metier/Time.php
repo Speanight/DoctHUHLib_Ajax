@@ -33,15 +33,13 @@ class Week {
         $this->end = $end;
     }
 
-    public function timeToArray() : array {
+    public function weekToArray() : array {
         $week = [];
-        $week["begin"] = $this->begin->format("Y-m-d H:i:s");       
-        $week["end"] = $this->end->format("Y-m-d H:i:s");
-        $week["days"] = [];
-        foreach($this->days as $day){
-            array_push($week["days"], $day->format("Y-m-d H:i:s"));
-        }
-        return $week;
 
+        $week["begin"] = $this->begin;
+        $week["end"] = $this->end;
+        $week["days"] = $this->days;
+
+        return $week;
     }
 }

@@ -15,15 +15,16 @@ class Meeting {
         $this->user         = $user;
     }
 
-    public function meetingToArray(){
+    public function meetingToArray(bool $user = true) : array {
         $meeting = [];
 
         $meeting["id"] = $this->id;
-        $meeting["beginning"] = $this->beginning->format("Y-m-d H:i:s");
-        $meeting["ending"] = $this->ending->format("Y-m-d H:i:s");;
+        $meeting["beginning"] = $this->beginning;
+        $meeting["ending"] = $this->ending;
         $meeting["place"] = $this->place;
-        $meeting["medecin"] = $this->medecin;
-        $meeting["user"] = $this->user->userToArray();
+        $meeting["medecin"] = $this->medecin->userToArray(false);
+        if ($this->user == null) $meeting["user"] = null;
+        else $meeting["user"] = $this->user->userToArray();
 
         return $meeting;
     }

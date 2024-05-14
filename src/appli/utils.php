@@ -132,11 +132,12 @@ class Utils {
         }
     }
 
-    public function destructSession(){
+    public function destructSession() : void{
         if(isset($_SESSION['user'])){
             session_destroy();
         }
-        $this->echoSuccess("Vous avez bien été déconnecté");
+        $ajax["message"] = $this->echoSuccess("Vous avez bien été déconnecté");
+        print_r(json_encode($ajax));
     }
 
     public function savePicture($pictureName, $inputName, $targetDir) {

@@ -104,22 +104,28 @@ class User {
         else return false;
     }
 
-    public function userToArray() : array {
+    public function userToArray($meetings = true) : array {
         $user = [];
-        $meetings = [];
+        $allMeetings = [];
 
         $user["id"] = $this->id;
         $user["name"] = ucfirst($this->name);
         $user["surname"] = strtoupper($this->surname);
         $user["phone"] = $this->phone;
         $user["mail"] = $this->mail;
-        $user["picture"] = "/assets/img/" . $this->picture;
+        $user["picture"] = $this->picture;
         if (isset($this->place)) $user["place"] = $this->place->placeToArray();
         if (isset($this->speciality)) $user["speciality"] = $this->speciality->specialityToArray();
-        foreach($this->meetings as $m){
-            $meetings[] = $m->meetingToArray();
+        if ($meetings) {
+            foreach($this->meetings as $day => $meetings) {
+                foreach ($meetings as $meeting) {
+                    // $allMeetings[key($date)] = $meeting->get_id();
+                    if (!isset($allMeetings[$day])) $allMeetings[$day] = [];
+                    array_push($allMeetings[$day], $meeting->meetingToArray(false));
+                }
+            }
+            $user["meetings"] = $allMeetings;
         }
-        $user["meetings"] = $meetings;
 
         return $user;
     }
