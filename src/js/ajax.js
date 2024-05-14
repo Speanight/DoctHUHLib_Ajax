@@ -124,7 +124,6 @@ function displayDatas(data, profile="user") {
     console.log("Here is the city array");
     console.log(city);
     for (let i = 0; i < city.length; i++) {
-      console.log();
       city[i].innerHTML = user.place.city.code_postal + " " + capitalizeFirstLetter(user.place.city.city);
     }
 
