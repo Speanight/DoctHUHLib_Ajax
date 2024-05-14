@@ -348,7 +348,7 @@ class cntrlApp {
         $daoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
         $user = $_SESSION['user'];
 
-        print_r(json_encode($daoMeeting->getNextMeeting($user)));
+        print_r(json_encode($daoMeeting->getNextMeeting($user)->meetingToArray()));
     }
 
     public function getSpecialities(){

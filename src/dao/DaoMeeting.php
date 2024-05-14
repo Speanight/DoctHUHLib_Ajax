@@ -45,7 +45,7 @@ class DaoMeeting {
         return $meeting;
     }
 
-    public function getMeetingsOfDoctor(User $user, $currentWeek = null) {
+    public function getMeetingsOfDoctor(User $user, $currentWeek = null) : array {
         $idUser = $user->get_id();
         if($currentWeek == null){ //all meetings of doctor requested
             $statement = $this->db->prepare("SELECT * FROM meeting WHERE id_user = :id ORDER BY beginning");
@@ -149,7 +149,6 @@ class DaoMeeting {
             $meeting    = new Meeting($elem['id'], $beginning, $ending, $place, $medecin, $user);
         }
         else $meeting = null;
-
         return $meeting;
     }
 
