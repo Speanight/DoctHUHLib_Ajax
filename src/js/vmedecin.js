@@ -42,7 +42,7 @@ function activateDeleteButton(){
             let selectZoneValue = document.getElementById("selectWeek").value; //used for the persistence of the selected week
             let idDoc = b.parentNode.getElementsByTagName("input")[0].value;
             let idMeeting = b.parentNode.getElementsByTagName("input")[1].value;
-            ajaxRequest("POST", "/espacedoc/delete", checkErrorMessage, "idDoc="+idDoc+"&idMeeting="+idMeeting); //Send the delete request
+            ajaxRequest("DELETE", "/espacedoc/delete", checkErrorMessage, "idDoc="+idDoc+"&idMeeting="+idMeeting); //Send the delete request - DELETE verb doesn't exist, default use REQUEST_METHOD POST in PHP
             ajaxRequest("GET", "/espacedoc/context", insertContext, "selectedWeek="+selectZoneValue); //Reload the page context
 
         });

@@ -91,7 +91,19 @@ function displayPage(data) { //Group header+footer and load the user datas
 
 function displayDatas(data, profile="user") {
   let user = data[profile];
+  console.log('Here is the doc json card');
+  console.log(profile);
   console.log(user);
+
+  for (const key in user) {
+    if (key == ("place" || "meetings" || "speciality")) {
+      for (const subKey in user[key]) {
+        displayUserData(user[key], subKey, profile + "-" + key);
+      }
+    }
+    displayUserData(user, key, profile);
+  }
+
   if (user != null) {
     let fullname = document.getElementsByClassName(profile + "-fullname");
     for (let i = 0; i < fullname.length; i++) {
@@ -105,22 +117,17 @@ function displayDatas(data, profile="user") {
 
     let street = document.getElementsByClassName(profile + "-place-street");
     for (let i = 0; i < street.length; i++) {
-      street[i].innerHTML = user["place"]["num_street"] + " | " + user["place"]["street"]["street"];
+      street[i].innerHTML = user.place.num_street + " " + capitalizeFirstLetter(user.place.street);
     }
 
     let city = document.getElementsByClassName(profile + "-place-city");
-    for (let i = 0; i < street.length; i++) {
-      city[i].innerHTML = user["place"]["city"]["code_postal"] + " " + user["place"]["city"]["city"];
+    console.log("Here is the city array");
+    console.log(city);
+    for (let i = 0; i < city.length; i++) {
+      console.log();
+      city[i].innerHTML = user.place.city.code_postal + " " + capitalizeFirstLetter(user.place.city.city);
     }
 
-    for (const key in user) {
-      if (key == ("place" || "meetings" || "speciality")) {
-        for (const subKey in user[key]) {
-          displayUserData(user[key], subKey, profile + "-" + key);
-        }
-      }
-      displayUserData(user, key, profile);
-    }
   }
 
   hideElementUser(user);
