@@ -167,6 +167,15 @@ class DaoMeeting {
         if(!empty($resutlCheck)){ //This timestamp already exists
             return false;
         }
+
+        $checkStatement = $this->db->prepare("SELECT * from meeting WHERE :end >= beginning AND :end < ending AND id_user = :id ");
+        $checkStatement->bindParam(":end", $ending);
+        $checkStatement->bindParam(":id", $idUser);
+        $checkStatement->execute();
+        $resutlCheck = $checkStatement->fetch(PDO::FETCH_ASSOC);
+        if(!empty($resutlCheck)){ //This timestamp already exists
+            return false;
+        }
         //
         //Insert the meeting
         $statement = $this->db->prepare('INSERT INTO meeting(beginning, ending, id_place, id_user) VALUES (:beg, :end, :id_place, :id_user)');
