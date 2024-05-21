@@ -14,7 +14,7 @@
  * @param callback - The function which will treat the returned data's from the backend
  * @param data - Specific data to append at the end of the URL (POST/GET arguments)
  */
-function ajaxRequest(type, url, callback, data = null)
+function ajaxRequest(type, url, callback, data = null, sendFile = false)
 {
   let xhr;
   console.log(url + "?" + data);
@@ -27,6 +27,11 @@ function ajaxRequest(type, url, callback, data = null)
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.setRequestHeader('Cache-Control', 'no-cache');
   xhr.setRequestHeader('Pragma', 'no-cache');
+
+  if (sendFile) {
+    xhr.setRequestHeader('X-File-Name', data.name);
+    xhr.setRequestHeader('X-File-Size', data.size);
+  }
 
   // Add the onload function.
   xhr.onload = () =>
@@ -133,10 +138,20 @@ function displayDatas(data, profile="user") {
 }
 
 function displayNextMeeting(data) {
+  console.log("displaynextmeeting!");
+  let elements = document.getElementsByClassName("meeting-not-none");
   if (data === null) {
-    let elements = document.getElementsByClassName("meeting-not-none");
     for (let i = 0; i < elements.length; i++) {
       elements[i].style.display = "none";
+    }
+  }
+  else {
+    console.log(elements);
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].innerHTML = `
+      Votre prochain rendez-vous est le ${data.beginning} à ${data.beginning} avec le médecin ${data.medecin.name} ${data.medecin.surname}, ${data.medecin.speciality.type}.
+      Il s'effectuera à ${data.medecin.place.street} ${data.medecin.place.num_street} ${data.medecin.place.city.city}. 
+      `;
     }
   }
 }
@@ -367,7 +382,7 @@ document.getElementById("epButton").addEventListener("click", () => {
 });
 document.getElementById("disconnect").addEventListener("click", () => {
     ajaxRequest("POST", "/disconnect", onceDisconnected);
-})
+});
 
 
 //------------------------------------------------------------------------------

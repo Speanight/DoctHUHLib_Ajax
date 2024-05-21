@@ -33,14 +33,15 @@ __Nginx:__ You will need to activate a similar module:
 #
 # Redirect all to index.php
 #
-RewriteEngine On
-
-# if a directory or a file exists, use it directly
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
 
 location / {
     try_files $uri $uri/ /index.php;
+}
+
+location ~ ^/var/(\(d+)/(.*)$ {
+    allow all;
+    types { }
+    default_type application/octet-stream;
 }
 ```
 # Folders
