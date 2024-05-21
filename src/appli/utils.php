@@ -7,7 +7,7 @@ const PATH_VIEW = "src/view/";
 const PATH_CSS = "src/css/";
 const DBHOST = "localhost";
 const DBNAME = "themightypoo";
-const PORT = 5433;
+const PORT = 5432;
 const USER = "postgres";
 const PASS = "Isen44N";
 
@@ -146,9 +146,10 @@ class Utils {
         $warnings   = [];
         $image      = "";
 
-        if ($_FILES[$inputName]["name"] != "") {
+        // if ($_FILES[$inputName]["name"] != "") {
+            if ($_SERVER['HTTP_X_FILE_NAME']) {
             $target_no_extension    = $targetDir . $pictureName;
-            $target_file            = $targetDir . $pictureName . "." . pathinfo($_FILES[$inputName]["name"], PATHINFO_EXTENSION);
+            $target_file            = $targetDir . $pictureName . "." . pathinfo(end(explode(".", $_SERVER["HTTP_X_FILE_NAME"])), PATHINFO_EXTENSION);
             $boolUpload             = true;
 
             if (file_exists($target_no_extension . ".png")) {
@@ -172,20 +173,21 @@ class Utils {
                 }
             }
 
-            $check = getimagesize($_FILES[$inputName]["tmp_name"]);
+            $check = getimagesize($_SERVER['HTTP_X_FILE_NAME']);
             if ($check === false) {
                 array_push($erreurs, "Photo incorrecte");
                 $boolUpload = false;
             }
 
-            if ($_FILES[$inputName]["size"] > 500000) {
+            if ($_SERVER['HTTP_X_FILE_SIZE'] > 500000) {
                 array_push($erreurs, "Photo trop lourde");
                 $boolUpload = false;
             }
 
             if ($boolUpload) {
-                if (move_uploaded_file($_FILES[$inputName]["tmp_name"], $target_file)) {
-                    $image = $pictureName . "." . pathinfo($_FILES[$inputName]["name"], PATHINFO_EXTENSION);
+                // copy('php://input', $targetDir . $pictureName);
+                if (move_uploaded_file($_SERVER['HTTP_X_FILE_NAME'], $target_file)) {
+                    $image = $pictureName . "." . pathinfo($_SERVER['HTTP_X_FILE_NAME'], PATHINFO_EXTENSION);
                 }
                 else {
                     array_push($warnings, "Photo non upload");

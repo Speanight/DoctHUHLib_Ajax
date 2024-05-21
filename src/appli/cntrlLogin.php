@@ -108,8 +108,7 @@ class  cntrlLogin {
         }
     }
 
-    public function getAccountEdit() {
-        $ajax   = [];
+    public function getAccountEdit($ajax = []) {
         $alerts = [];
         $daoUser        = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
         $daoSpeciality  = new DaoSpeciality(DBHOST, DBNAME, PORT, USER, PASS);
@@ -149,18 +148,16 @@ class  cntrlLogin {
         $utils      = new Utils();
         $daoUser    = new DaoUser(DBHOST, DBNAME, PORT, USER, PASS);
 
-        if($utils->hasLetters($phone)){
-            echo $utils->echoWarning("Un numéro de téléphone ne peut contenir de lettres");
+        if($utils->hasLetters($phone)) {
+            $ajax['message'] = $utils->echoWarning("Un numéro de téléphone ne peut contenir de lettres");
             $this->getAccountEdit();
-            return;
         }
-        if(strlen($phone) != 10){
-            echo $utils->echoInfo("Veuillez saisir un numéro de téléphone français");
+        elseif(strlen($phone) != 10){
+            $ajax['message'] = $utils->echoInfo("Veuillez saisir un numéro de téléphone français");
             $this->getAccountEdit();
-            return;
         }
-        if ($newPass != $newPassConf) {
-            echo $utils->echoError("Les nouveaux mots de passe ne correspondent pas");
+        elseif ($newPass != $newPassConf) {
+            $ajax['message'] = $utils->echoError("Les nouveaux mots de passe ne correspondent pas");
         }
         else {
             $photo = null;
@@ -169,10 +166,10 @@ class  cntrlLogin {
             $result = $daoUser->getEditUser($user, $email, $phone, $photo, $oldPass, $newPass);
         }
         if ($result == null) {
-            echo $utils->echoError("Votre ancien mot de passe est incorrect");
+            $ajax['message'] = $utils->echoError("Votre ancien mot de passe est incorrect");
         }
-        echo $utils->echoSuccess("Vos informations ont été mises à jour");
-        $this->getAccountEdit();
+        $ajax['message'] = $utils->echoSuccess("Vos informations ont été mises à jour");
+        $this->getAccountEdit($ajax);
     }
 
     public function getRegisterDocResult() : void {
@@ -201,12 +198,12 @@ class  cntrlLogin {
         $codeInsee = $codeInseeResult["code_insee"];
 
         if(empty($password)){
-            echo $utils->echoWarning("Veuillez saisir un mot de passe"),
+            echo $utils->echoWarning("Veuillez saisir un mot de passe");
             require PATH_VIEW . "vmconnection.php";
             return;
         }
         if(empty($mail)){
-            echo $utils->echoWarning("Veuillez saisir un email"),
+            echo $utils->echoWarning("Veuillez saisir un email");
             require PATH_VIEW . "vmconnection.php";
             return;
         }
