@@ -29,7 +29,7 @@ Then add this to your vhost conf file:
 ```
 
 __Nginx:__ You will need to activate a similar module:
-```
+```nginxconf
 #
 # Redirect all to index.php
 #
