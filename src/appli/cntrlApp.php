@@ -161,16 +161,17 @@ class cntrlApp {
      * @return void
      */
     public function deleteMeeting() : void{
+        parse_str(file_get_contents('php://input'), $_DELETE);
         $utils = new Utils();
         $user = $_SESSION["user"];
-        $idDoc = $_POST["idDoc"];
+        $idDoc = $_DELETE["idDoc"];
         if($idDoc != $user->get_id()){ //Malicious user tried to craft a request to delete a non-propretary meeting
             $ajax["message"] = $utils->echoError("Vous n'êtes pas autorisé à faire ceci");
             print_r(json_encode($ajax));
             return;
         }
         $DaoMeeting = new DaoMeeting(DBHOST, DBNAME, PORT, USER, PASS);
-        $idMeeting = $_POST["idMeeting"];
+        $idMeeting = $_DELETE["idMeeting"];
         $DaoMeeting->deleteMeeting($idMeeting, $idDoc);
     }
 

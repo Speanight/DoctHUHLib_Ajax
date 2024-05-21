@@ -148,8 +148,9 @@ function displayNextMeeting(data) {
   else {
     console.log(elements);
     for (let i = 0; i < elements.length; i++) {
+      let beginning = data.beginning.date.split(".")[0].split(" ");
       elements[i].innerHTML = `
-      Votre prochain rendez-vous est le ${data.beginning} à ${data.beginning} avec le médecin ${data.medecin.name} ${data.medecin.surname}, ${data.medecin.speciality.type}.
+      Votre prochain rendez-vous est le ${beginning[0]} à ${beginning[1]} avec le médecin ${data.medecin.name} ${data.medecin.surname}, ${data.medecin.speciality.type}.
       Il s'effectuera à ${data.medecin.place.street} ${data.medecin.place.num_street} ${data.medecin.place.city.city}. 
       `;
     }

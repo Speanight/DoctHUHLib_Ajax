@@ -54,8 +54,10 @@ elseif ($method == "POST") {
     elseif ($uri === "/disconnect")                         $utils->destructSession();
     elseif ($uri == '/rendezvous/cancel')                   $cntrlApp->getCancelMeeting();
     elseif($uri == '/espacedoc/result')                     $cntrlApp->createMeeting();
-    elseif($uri == '/espacedoc/delete')                     $cntrlApp->deleteMeeting();
     elseif($uri == '/account/result')                       $cntrlLogin->getAccountEditResult();
     elseif ($uri == '/rendezvous/medecin/reserver')         $cntrlApp->userReservation();
     else             header("Location: ". 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}"); //Sanitize the HTTP_ value in sg $_SERVER and relocate to the root document
+}
+elseif($method == "DELETE"){
+    if($uri == '/espacedoc/delete')                     $cntrlApp->deleteMeeting();
 }
